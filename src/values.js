@@ -108,8 +108,8 @@ const dataPoints = {
     },
     "Average Wage": {
         measure: "Average%20Wage",
-        format: function(value) {
-            let val = String(value)
+        format: function(...args) {
+            let val = String(args[0]);
             let fs = val.lastIndexOf('.');
             val = val.substring(0, fs + 3);
             let commaCounter = fs - 1;
@@ -117,7 +117,7 @@ const dataPoints = {
                 commaCounter -= 3;
                 val = val.substring(0, commaCounter + 1) + `,` + val.substring(commaCounter + 1);
             }
-            return `~$${val}`;
+            return `Average wage ${((args.length < 3) ? '' : `of ${args[2]}`)} in ${args[1]} is ~$${val}`;
         }
     }
 }

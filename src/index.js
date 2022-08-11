@@ -31,14 +31,15 @@ async function getData(e) {
     url += `&${dataPoints.apiCall(dPoints.value)}&year=latest`;
     let locResult = await fetchData(url)
     .then(arr => arr.data[0][dPoints.value]);
-    //Append location data to DOM
-    appendNewChild(results, 'p', {text: `${dPoints.value} in ${loc.value.replace("_", " ")}: ${dataPoints[dPoints.value].format(locResult)}`});
     
     //Now we do the same for the occupation
     url += "&" + occupations.apiCall(occ.value)[0];
     let occResult = await fetchData(url)
     .then(arr => arr.data[0][dPoints.value]);
-    appendNewChild(results, 'p', {text: `${dPoints.value} of ${occ.value} in ${loc.value.replace("_", " ")}: ${dataPoints[dPoints.value].format(occResult)}`});
+    
+    //Append results to the DOM
+    appendNewChild(results, 'p', {text: dataPoints[dPoints.value].format(locResult, loc.value)});
+    appendNewChild(results, 'p', {text: dataPoints[dPoints.value].format(occResult, loc.value, occ.value)});
 }
 
 //Just used to simplify fetch requests
