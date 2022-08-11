@@ -1,0 +1,37 @@
+#main-content, #comp-bg{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+body {
+    margin: 0%;
+    padding: 0%;
+}
+
+#comparers {
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+#results p {
+    display: inline-block;
+    width: 49%;
+    text-align: center;
+}
+
+select, #submit {
+    margin: 10px;
+    margin-bottom: 8px;
+    margin-top: 8px;
+}
+
+#comp-bg {
+    width: 100%;
+    background-color: seagreen;
+}
