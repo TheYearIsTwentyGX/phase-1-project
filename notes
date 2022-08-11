@@ -1,0 +1,3 @@
+Location based api call:
+https://datausa.io/api/data?Geography=04000US29&drilldowns=Race,Ethnicity&measures=Hispanic%20Population,Hispanic%20Population%20Moe
+    Notes: Geography tag with ID to get the state
