@@ -23,6 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
 //This is called when submitting the form
 async function getData(e) {
     e.preventDefault();
+    results.innerHTML = '';
+
     //First we grab the location data
     let url = baseURL;
     url += states.apiCall(loc.value);
@@ -30,13 +32,13 @@ async function getData(e) {
     let locResult = await fetchData(url)
     .then(arr => arr.data[0][dPoints.value]);
     //Append location data to DOM
-    appendNewChild(results, 'p', {text: `${dPoints.value} in ${loc.value}: ${dataPoints[dPoints.value].format(locResult)}`});
+    appendNewChild(results, 'p', {text: `${dPoints.value} in ${loc.value.replace("_", " ")}: ${dataPoints[dPoints.value].format(locResult)}`});
     
     //Now we do the same for the occupation
     url += "&" + occupations.apiCall(occ.value)[0];
     let occResult = await fetchData(url)
     .then(arr => arr.data[0][dPoints.value]);
-    appendNewChild(results, 'p', {text: `${dPoints.value} of ${occ.value} in ${loc.value}: ${dataPoints[dPoints.value].format(occResult)}`});
+    appendNewChild(results, 'p', {text: `${dPoints.value} of ${occ.value} in ${loc.value.replace("_", " ")}: ${dataPoints[dPoints.value].format(occResult)}`});
 }
 
 //Just used to simplify fetch requests
@@ -49,7 +51,7 @@ async function fetchData(url) {
 function populateSelect(select, keys) {
     for (const options of Object.keys(keys)) {
         if (options != "apiCall")
-            appendNewChild(select, 'option', {value: options, text: options});
+            appendNewChild(select, 'option', {value: options, text: options.replace("_", " ")});
     }
 }
 
