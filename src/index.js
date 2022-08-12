@@ -2,7 +2,7 @@ let occ;
 let loc;
 let dPoints;
 let submit;
-let locResults;
+let results;
 let occResults;
 const baseURL = "https://datausa.io/api/data?";
 
@@ -11,8 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     occ = document.querySelector('#occupations');
     loc = document.querySelector('#locations');
     dPoints = document.querySelector('#dataPoints');
-    locResults = document.querySelector('#results');
-    //occResults = document.querySelector('#occ-results');
+    results = document.querySelector('#results');
     submit = document.querySelector('#submit');
     submit.addEventListener('click', (e) => getData(e));
 
@@ -25,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 //This is called when submitting the form
 async function getData(e) {
     e.preventDefault();
-    locResults.innerHTML = '';
+    results.innerHTML = '';
 
     //First we grab the location data
     let url = baseURL;
@@ -40,8 +39,8 @@ async function getData(e) {
     .then(arr => arr.data[0][dPoints.value]);
     
     //Append results to the DOM
-    appendNewChild(locResults, 'p', {text: dataPoints[dPoints.value].format(locResult, loc.value)});
-    appendNewChild(locResults, 'p', {text: dataPoints[dPoints.value].format(occResult, loc.value, occ.value)});
+    appendNewChild(results, 'span', {text: dataPoints[dPoints.value].format(occResult, loc.value, occ.value.toLowerCase()), style: "white-space: pre-line"});
+    appendNewChild(results, 'span', {text: dataPoints[dPoints.value].format(locResult, loc.value), style: "white-space: pre-line"});
 }
 
 //Just used to simplify fetch requests
@@ -70,6 +69,8 @@ function appendNewChild(parent, tag, attr) {
         Object.keys(attr).forEach(k => {
             if (k === "text")
                 ne.textContent = attr[k];
+            else if (k === "html")
+                ne.innerHTML = attr[k];
             else if (k === "event")
                 ne.addEventListener(attr[k]['type'], attr[k]['callback']);
             else

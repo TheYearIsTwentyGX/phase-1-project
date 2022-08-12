@@ -9,20 +9,26 @@
 body {
     margin: 0%;
     padding: 0%;
+    background-color: rgb(36, 56, 56);
 }
 
 #comparers {
     display: inline-flex;
-    flex-direction: row;
+    flex-direction: row-reverse;
     justify-content: center;
     align-content: center;
     align-items: center;
 }
 
-#results p {
+#results-bg {
+    width: 100%
+}
+
+#results p, span {
     display: inline-block;
     width: 49%;
     text-align: center;
+    color: lightslategray;
 }
 
 select, #submit {
@@ -33,5 +39,4 @@ select, #submit {
 
 #comp-bg {
     width: 100%;
-    background-color: seagreen;
 }

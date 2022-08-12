@@ -117,7 +117,7 @@ const dataPoints = {
                 commaCounter -= 3;
                 val = val.substring(0, commaCounter + 1) + `,` + val.substring(commaCounter + 1);
             }
-            return `Average wage ${((args.length < 3) ? '' : `of ${args[2]}`)} in ${args[1]} is ~$${val}`;
+            return `Average wage ${((args.length < 3) ? 'of civilians' : `of ${args[2]}`)} in\n${args[1]} is ~$${val}`;
         }
     }
 }
