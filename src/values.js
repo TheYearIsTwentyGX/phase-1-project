@@ -119,5 +119,11 @@ const dataPoints = {
             }
             return `Average wage ${((args.length < 3) ? 'of civilians' : `of ${args[2]}`)} in\n${args[1]} is ~$${val}`;
         }
-    }
+    },
+    "Presidential Elections": {
+        measure: "Candidate+Votes,Total+Votes&drilldowns=State",
+        format: function(...args) {
+            //if (args[0] == )
+        }
+    },
 }
