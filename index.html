@@ -6,14 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="styles/style.css">
-    <script src="src/values.js"></script>
+    <script> const baseURL = { URL: "https://datausa.io/api/data?", Priority: 0 };</script>
+    <script src="src/tools.js"></script>
+    <script src="src/dataFiles/refs.js"></script>
+    <script src="src/dataFiles/filters.js"></script>
     <script src="src/index.js"></script>
 </head>
 <body>
     <div id="main-content">
         <div id="comp-bg">
             <div id="comp-labels">
-                
+
             </div>
             <div id="comparers">
                 <select id="locations"></select>

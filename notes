@@ -2,4 +2,6 @@ Location based api call:
 https://datausa.io/api/data?Geography=04000US29&drilldowns=Race,Ethnicity&measures=Hispanic%20Population,Hispanic%20Population%20Moe
     Notes: Geography tag with ID to get the state
 
+API Call for 3D APIs?
 https://api-ts-uranium.datausa.io/tesseract/data?cube=Data_USA_President_election&drilldowns=Year,State&measures=Candidate+Votes,Total+Votes
+https://api-ts-uranium.datausa.io/tesseract/data?cube=Data_USA_President_election&Year=2020&drilldowns=Year,State,Candidate&measures=Candidate+Votes
