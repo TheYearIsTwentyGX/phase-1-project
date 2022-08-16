@@ -27,10 +27,10 @@ async function getData2(e) {
     url += dArgs[0];
     if (true) {
         url = url.replace("%TG_LOC%", "State");
-        url += "&Year=2020";
+        //url += "&Year=2020";
     }
-    let data = await fetchData(url).then (d => {console.log(d.data); return d.data;});
-    console.log(dataPoints[dPoints.value].format(data));
+    let data = await fetchData(url).then (d => d.data);
+    appendNewChild(results, 'div', {html: dataPoints[dPoints.value].format(data), style: "white-space: pre-line"});
 }
 
 //This is called when submitting the form

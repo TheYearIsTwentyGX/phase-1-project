@@ -33,16 +33,23 @@ const dataPoints = {
         }
     },
     "Presidential Elections": {
-        arg: "cube=Data_USA_President_election&drilldowns=%TG_LOC%,Candidate&measures=Candidate+Votes",
+        arg: "cube=Data_USA_President_election&Year=2020&drilldowns=State,Candidate,Party&measures=Candidate+Votes&Party=Democratic,Republican",
         URL: UrlStyles.Uranium,
         format: function(...args) {
             let retStr = "";
-            if (args.length === 1) {
-                for (let state of args[0]) {
-                    
-                }
-                return retStr;
+            let demVotes = args[0].filter(x => x.Party === "Democratic");
+            let totalDemVotes = demVotes.reduce((prev, curr) => prev + curr["Candidate Votes"], 0);
+            let repVotes = args[0].filter(x => x.Party === "Republican");
+            let totalRepVotes = repVotes.reduce((prev, curr) => prev + curr["Candidate Votes"], 0);
+            console.log(totalDemVotes + " vs " + totalRepVotes);
+            const demWinner = (totalDemVotes > totalRepVotes);
+            for (let i = 0; i < demVotes.length; i++) {
+                let percent = (((demWinner) ? demVotes[i]["Candidate Votes"] : repVotes[i]["Candidate Votes"])*100 / (demVotes[i]["Candidate Votes"] + repVotes[i]["Candidate Votes"])).toString();
+                let fs = percent.lastIndexOf('.');
+                percent = percent.substring(0, fs + 3);
+                retStr += `${demVotes[i].State} voted ${percent}% ${(demWinner) ? "Democrat" : "Republican"}\n\n`;
             }
+            return retStr;
         }
     },
 }
