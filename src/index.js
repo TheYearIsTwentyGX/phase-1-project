@@ -1,6 +1,8 @@
 let dataSet1;
 let dataSet2;
 let scope;
+let filters;
+let subfilters;
 let submit;
 let results;
 let occResults;
@@ -11,11 +13,15 @@ document.addEventListener("DOMContentLoaded", () => {
     dataSet1 = document.querySelector('#data-set-1');
     dataSet2 = document.querySelector('#data-set-2');
     scope = document.querySelector('#scope');
+    filters = Array.from(document.querySelectorAll('#filter-div select'));
+    subfilters = document.querySelectorAll('#sub-filter-div select');
     stateSelects = document.querySelectorAll('#states-div select');
     results = document.querySelector('#results');
     submit = document.querySelector('#submit');
     submit.addEventListener('click', (e) => getData(e));
     scope.addEventListener('change', scopeChange);
+    dataSet1.addEventListener('change', dataPointChange);
+    filters[0].addEventListener('change', subFilterChange);
 
     //Populate the dropdowns
     populateSelect(dataSet1, dataPoints);
@@ -30,8 +36,8 @@ async function getData(e) {
     //dataSet1
     url = buildURL(dataSet1.value, 0);
     let results1 = await fetchData(url).then(d => dataPoints[dataSet1.value].parse(d.data));
-    if (dataSet1.value == "Election Results")
-        appendNewChild(results, 'div', {html: dataPoints[dataSet1.value].format(results1), style: "white-space: pre-line;"});
+    if (dataSet1.value != "Household Income")
+        appendNewChild(results, 'span', {html: dataPoints[dataSet1.value].format(results1), style: "white-space: pre-line;"});
     console.log(results1);
 }
 

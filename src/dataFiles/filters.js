@@ -22,13 +22,21 @@ const dataPoints = {
         drilldowns: [],
         URL: UrlStyles.Basic,
         parse: function(...args) {
-            console.log(args[0]);
+            retObj = [];
+            for (let state of args[0]) {
+                let obj = {};
+                obj.State = state.State;
+                obj.Wage = formatValue(state["Average Wage"], "money", false);
+                retObj.push(obj);
+            }
+            return retObj;
         },
         format: function(...args) {
-            console.log(args);
-            let val = String(args[0]);
-            formatValue(val, "money", true);
-            return `Average wage ${((args.length < 3) ? 'of civilians' : `of ${args[2]}`)} in\n${args[1]} is ~$${val}`;
+            let retStr = '';
+            for (let state of args[0]) {
+                retStr += `Average wage in ${state.State} is ${formatValue(state.Wage, "money", true)}\n\n`;
+            }
+            return retStr;
         }
     },
     "Election Results": {
@@ -63,7 +71,7 @@ const dataPoints = {
                     color = 'red';
                     rgb = 'rgb(160,50,50)';
                 }
-                retStr += `<span>${state.State} voted</span><span style="color: ${rgb};">${color} (${state.Results}%)</span>\n\n`
+                retStr += `<span>${state.State} voted</span><span style="color: ${rgb};">${color.toUpperCase()} (${state.Results}%)</span>\n\n`
             }
             return retStr;
         }

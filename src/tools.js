@@ -9,10 +9,31 @@ function scopeChange(e) {
     }
 }
 
+function dataPointChange(e) {
+    let dataSet = (e.target == dataSet1) ? dataSet1 : dataSet2;
+    let filterSelect = (e.target == dataSet1) ? filters[0] : filters[1];
+    switch (dataSet.value) {
+        case "Average Wage":
+            populateSelect(filterSelect, ["Occupations", "States"])
+            filterSelect.classList = '';
+            break;
+    }
+}
+function subFilterChange(e) {
+    let subfilter = subfilters[filters.indexOf(e.target)];
+    switch (e.target.value) {
+        case "Occupations":
+            populateSelect(subfilter, occupations);
+            subfilter.classList = '';
+            break;
+    }
+}
+
 //Function to populate the dropdowns
 function populateSelect(select, keys) {
     select.innerHTML = '';
-    for (const option of Object.keys(keys)) {
+    let options = (Array.isArray(keys)) ? keys : Object.keys(keys);
+    for (const option of options) {
         if (!ignoreProps.includes(option))
             appendNewChild(select, 'option', {value: option, text: option.replace("_", " ")});
     }
