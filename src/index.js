@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     stateSelects = document.querySelectorAll('#states-div select');
     results = document.querySelector('#results');
     submit = document.querySelector('#submit');
-    submit.addEventListener('click', (e) => getData2(e));
+    submit.addEventListener('click', (e) => getData(e));
     scope.addEventListener('change', scopeChange);
 
     //Populate the dropdowns
@@ -24,26 +24,27 @@ document.addEventListener("DOMContentLoaded", () => {
     populateSelect(stateSelects[1], states);
 })
 
-async function getData2(e) {
+async function getData(e) {
     e.preventDefault();
     let url = "";
-    let drilldowns = "&drilldowns=";
     //dataSet1
-    url = buildURL(dataSet1.value);
-    console.log(url);
-    await fetchData(url).then(d => console.log(dataPoints[dataSet1.value].parse(d.data)));
-
-    //appendNewChild(results, 'div', {html: dataPoints[dPoints.value].format(data, "All"), style: "white-space: pre-line; color: white;"});
+    url = buildURL(dataSet1.value, 0);
+    let results1 = await fetchData(url).then(d => dataPoints[dataSet1.value].parse(d.data));
+    if (dataSet1.value == "Election Results")
+        appendNewChild(results, 'div', {html: dataPoints[dataSet1.value].format(results1), style: "white-space: pre-line;"});
+    console.log(results1);
 }
 
-function buildURL(datapoint) {
+function buildURL(datapoint, index) {
+    let drilldowns = [];
+    drilldowns = undefined;
     drilldowns = dataPoints[datapoint].drilldowns;
     if (drilldowns == undefined)
         drilldowns = [];
     let retUrl = dataPoints.apiCall(datapoint);
     switch (scope.value) {
         case "Single_State":
-            retUrl += `&${states.apiCall("Alabama")}`;
+            retUrl += `&${states.apiCall(stateSelects[index].value)}`;
             break;
         case "National":
             console.log("not implemented");
@@ -52,7 +53,6 @@ function buildURL(datapoint) {
             drilldowns.push("State");
             break;
     }
-    console.log(drilldowns);
     let drillString = '&drilldowns=';
     for (let drill of drilldowns) {
         drillString += drill + ',';

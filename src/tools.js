@@ -2,12 +2,10 @@ const ignoreProps = ["apiCall", "generalData"];
 
 function scopeChange(e) {
     if (e.target.value == "Single_State") {
-        stateSelects[0].classList = '';
-        stateSelects[1].classList = '';
+        document.querySelector('#states-div').classList = '';
     }
     else {
-        stateSelects[0].classList = 'hidden';
-        stateSelects[1].classList = 'hidden';
+        document.querySelector('#states-div').classList = 'hidden';
     }
 }
 
@@ -20,13 +18,38 @@ function populateSelect(select, keys) {
     }
 }
 
+function formatValue(value, type, includeSymbol = true) {
+    let fs;
+    switch (type) {
+        case "money":
+            value = value.toString();
+            fs = value.lastIndexOf('.');
+            if (fs > 0)
+                value = value.substring(0, fs + 3);
+            else
+                fs = value.length;
+            let commaCounter = fs - 1;
+            if (includeSymbol) {
+                while (commaCounter > 2) {
+                    commaCounter -= 3;
+                    value = value.substring(0, commaCounter + 1) + `,` + value.substring(commaCounter + 1);
+                }
+            }
+            console.log(value);
+            return (includeSymbol) ? `$${value}` : parseFloat(value);
+        case "percentage":
+            let percent = (value[0]/value[1]*100).toString();
+            fs = percent.lastIndexOf('.');
+            percent = percent.substring(0, fs + 3);
+            return (includeSymbol) ? `${percent}%` : parseFloat(percent);
+    }
+} 
+
 //Just used to simplify fetch requests
 async function fetchData(url) {
     return await fetch(url)
     .then(d => d.json());
 }
-
-
 
 //Helper functions to make adding new elements to the DOM a bit easier
 function appendNewChild(parent, tag, attr) {
