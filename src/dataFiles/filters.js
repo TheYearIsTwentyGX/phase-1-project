@@ -21,16 +21,13 @@ const dataPoints = {
         arg: "measure=Average%20Wage",
         drilldowns: [],
         URL: UrlStyles.Basic,
+        parse: function(...args) {
+            console.log(args[0]);
+        },
         format: function(...args) {
             console.log(args);
             let val = String(args[0]);
-            let fs = val.lastIndexOf('.');
-            val = val.substring(0, fs + 3);
-            let commaCounter = fs - 1;
-            while (commaCounter > 1) {
-                commaCounter -= 3;
-                val = val.substring(0, commaCounter + 1) + `,` + val.substring(commaCounter + 1);
-            }
+            formatValue(val, "money", true);
             return `Average wage ${((args.length < 3) ? 'of civilians' : `of ${args[2]}`)} in\n${args[1]} is ~$${val}`;
         }
     },
@@ -47,28 +44,36 @@ const dataPoints = {
             const demWinner = (totalDemVotes > totalRepVotes);
             for (let i = 0; i < demVotes.length; i++) {
                 let obj = {};
-                obj[demVotes[i].State] = calculateState(demVotes[i]["Candidate Votes"], repVotes[i]["Candidate Votes"]);
+                obj.State = demVotes[i].State;
+                obj.Results = formatValue([demVotes[i]["Candidate Votes"], demVotes[i]["Candidate Votes"] + repVotes[i]["Candidate Votes"]], "percentage", false);
                 retObj.push(obj);
             }    
             return retObj;
-
-            function calculateState(demVotes, repVotes) {
-                let percent = ((demVotes * 100) / (demVotes + repVotes)).toString();
-                let fs = percent.lastIndexOf('.');
-                percent = percent.substring(0, fs + 3);
-                return parseFloat(percent);
-            }
         },
         format: function(results) {
             let retStr = '';
             for (let state of results) {
-
+                let color = 'purple';
+                let rgb = 'rgb(190,40,190)';
+                if (state.Results > 60) {
+                    color = 'blue';
+                    rgb = 'lightblue';
+                }
+                else if (state.Results < 40){
+                    color = 'red';
+                    rgb = 'rgb(160,50,50)';
+                }
+                retStr += `<span>${state.State} voted</span><span style="color: ${rgb};">${color} (${state.Results}%)</span>\n\n`
             }
+            return retStr;
         }
     },
     "Household Income": {
         arg: "measure=Household%20Income",
         URL: UrlStyles.Basic,
+        parse: function(...args) {
+            console.log(args[0]);
+        },
         format: function(...args) {
             console.log(args);
         }
@@ -79,6 +84,7 @@ const states = {
     apiCall: function(state) {
         return `State=${this[state].id}`;
     },
+    All: {},
     Alabama: {
         id: "04000US01"
     },
