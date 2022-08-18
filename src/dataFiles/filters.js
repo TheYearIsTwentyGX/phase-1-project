@@ -1,10 +1,11 @@
 const occupations = {
     apiCall: function(occ) {
-        return [`PUMS Occupation=${this[occ].id}`, this.generalData.URL];
+        return (occ == "All") ? '' : `PUMS Occupation=${this[occ].id}`;
     },
     generalData: {
         URL: UrlStyles.Basic
     },
+    "All": {},
      "Police Officers": {
         category: "Detailed Occupation",
         id: 333050,
@@ -14,13 +15,14 @@ const occupations = {
 
 const dataPoints = {
     apiCall: function(point) {
-        let retURL = (Object.hasOwn(this[point], "URL")) ? this[point].URL : baseURL;
-        return [this[point].arg, retURL];
+        return this[point].URL + this[point].arg;
     },
     "Average Wage": {
         arg: "measure=Average%20Wage",
+        drilldowns: [],
         URL: UrlStyles.Basic,
         format: function(...args) {
+            console.log(args);
             let val = String(args[0]);
             let fs = val.lastIndexOf('.');
             val = val.substring(0, fs + 3);
@@ -32,32 +34,50 @@ const dataPoints = {
             return `Average wage ${((args.length < 3) ? 'of civilians' : `of ${args[2]}`)} in\n${args[1]} is ~$${val}`;
         }
     },
-    "Presidential Elections": {
-        arg: "cube=Data_USA_President_election&Year=2020&drilldowns=State,Candidate,Party&measures=Candidate+Votes&Party=Democratic,Republican",
+    "Election Results": {
+        arg: "cube=Data_USA_President_election&Year=2020&measures=Candidate+Votes&Party=Democratic,Republican",
         URL: UrlStyles.Uranium,
-        format: function(...args) {
-            let retStr = "";
+        drilldowns: ["Party"],
+        parse: function(...args) {
+            retObj = [];
             let demVotes = args[0].filter(x => x.Party === "Democratic");
             let totalDemVotes = demVotes.reduce((prev, curr) => prev + curr["Candidate Votes"], 0);
             let repVotes = args[0].filter(x => x.Party === "Republican");
             let totalRepVotes = repVotes.reduce((prev, curr) => prev + curr["Candidate Votes"], 0);
-            console.log(totalDemVotes + " vs " + totalRepVotes);
             const demWinner = (totalDemVotes > totalRepVotes);
             for (let i = 0; i < demVotes.length; i++) {
-                let percent = (((demWinner) ? demVotes[i]["Candidate Votes"] : repVotes[i]["Candidate Votes"])*100 / (demVotes[i]["Candidate Votes"] + repVotes[i]["Candidate Votes"])).toString();
+                let obj = {};
+                obj[demVotes[i].State] = calculateState(demVotes[i]["Candidate Votes"], repVotes[i]["Candidate Votes"]);
+                retObj.push(obj);
+            }    
+            return retObj;
+
+            function calculateState(demVotes, repVotes) {
+                let percent = ((demVotes * 100) / (demVotes + repVotes)).toString();
                 let fs = percent.lastIndexOf('.');
                 percent = percent.substring(0, fs + 3);
-                retStr += `${demVotes[i].State} voted ${percent}% ${(demWinner) ? "Democrat" : "Republican"}\n\n`;
+                return parseFloat(percent);
             }
-            return retStr;
+        },
+        format: function(results) {
+            let retStr = '';
+            for (let state of results) {
+
+            }
         }
     },
+    "Household Income": {
+        arg: "measure=Household%20Income",
+        URL: UrlStyles.Basic,
+        format: function(...args) {
+            console.log(args);
+        }
+    }
 }
 
 const states = {
     apiCall: function(state) {
-        let retURL = (Object.hasOwn(this[state], 'URL')) ? this[state].url : baseURL;
-        return [`Geography=${this[state].id}`, retURL];
+        return `State=${this[state].id}`;
     },
     Alabama: {
         id: "04000US01"

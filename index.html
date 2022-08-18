@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="styles/style.css">
@@ -18,13 +16,26 @@
             <div id="comp-labels">
 
             </div>
-            <div id="comparers">
-                <select id="locations"></select>
-                <select id="occupations"></select>
+            <div id="scope-div">
+                <select id="scope">
+                    <option value="National">National</option>
+                    <option value="All_States">All States</option>
+                    <option value="Single_State">Single State</option>
+
+                </select>
             </div>
-        </div>
-        <div id="data-point">
-            <select id="dataPoints"></select>
+            <div id="data-sets-div">
+                <select id="data-set-1"></select>
+                <select id="data-set-2"></select>
+            </div>
+            <div id="filter-div">
+                <select id="filter-1" class="hidden"></select>
+                <select id="filter-2" class="hidden"></select>
+            </div>
+            <div id="states-div">
+                <select id="states-1" class="hidden"></select>
+                <select id="states-2" class="hidden"></select>
+            </div>
         </div>
         <div>
             <button type="submit" id="submit">Get Data</button>
