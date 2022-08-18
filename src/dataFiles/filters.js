@@ -1,6 +1,6 @@
 const occupations = {
     apiCall: function(occ) {
-        return (occ == "All") ? '' : `PUMS Occupation=${this[occ].id}`;
+        return (occ == "All") ? '' : `&PUMS Occupation=${this[occ].id}`;
     },
     generalData: {
         URL: UrlStyles.Basic
@@ -23,18 +23,21 @@ const dataPoints = {
         URL: UrlStyles.Basic,
         parse: function(...args) {
             retObj = [];
+
             for (let state of args[0]) {
                 let obj = {};
                 obj.State = state.State;
+                if (args[1].Occ != undefined)
+                    obj.Occ = args[1].Occ;
                 obj.Wage = formatValue(state["Average Wage"], "money", false);
                 retObj.push(obj);
             }
             return retObj;
         },
-        format: function(...args) {
+        format: function(results) {
             let retStr = '';
-            for (let state of args[0]) {
-                retStr += `Average wage in ${state.State} is ${formatValue(state.Wage, "money", true)}\n\n`;
+            for (let state of results) {
+                retStr += `Average wage ${(state.Occ != undefined) ? `of ${state.Occ}` : ''} in ${(state.State == undefined) ? 'the United States' : state.State } is ${formatValue(state.Wage, "money", true)}\n\n`;
             }
             return retStr;
         }
@@ -80,10 +83,21 @@ const dataPoints = {
         arg: "measure=Household%20Income",
         URL: UrlStyles.Basic,
         parse: function(...args) {
-            console.log(args[0]);
+            let retObj = [];
+            for (let state of args[0]) {
+                let obj = {};
+                obj.State = state.State;
+                obj["Household Income"] = state["Household Income"];
+                retObj.push(obj);
+            }
+            return retObj;
         },
-        format: function(...args) {
-            console.log(args);
+        format: function(results) {
+            let retStr = '';
+            for (let state of results) {
+                retStr += `The average Household Income of ${state.State} is ${formatValue(state["Household Income"], "money", true)}.\n\n`;
+            }
+            return retStr;
         }
     }
 }

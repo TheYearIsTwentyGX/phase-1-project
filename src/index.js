@@ -14,34 +14,44 @@ document.addEventListener("DOMContentLoaded", () => {
     dataSet2 = document.querySelector('#data-set-2');
     scope = document.querySelector('#scope');
     filters = Array.from(document.querySelectorAll('#filter-div select'));
-    subfilters = document.querySelectorAll('#sub-filter-div select');
+    subfilters = Array.from(document.querySelectorAll('#sub-filter-div select'));
     stateSelects = document.querySelectorAll('#states-div select');
     results = document.querySelector('#results');
     submit = document.querySelector('#submit');
     submit.addEventListener('click', (e) => getData(e));
     scope.addEventListener('change', scopeChange);
     dataSet1.addEventListener('change', dataPointChange);
+    dataSet2.addEventListener('change', dataPointChange);
     filters[0].addEventListener('change', subFilterChange);
+    filters[1].addEventListener('change', subFilterChange);
 
     //Populate the dropdowns
     populateSelect(dataSet1, dataPoints);
     populateSelect(dataSet2, dataPoints);
     populateSelect(stateSelects[0], states);
     populateSelect(stateSelects[1], states);
+    populateSelect(filters[0], ["Occupations", "States"]);
+    populateSelect(filters[1], ["Occupations", "States"]);
+    populateSelect(subfilters[0], occupations);
+    populateSelect(subfilters[1], occupations);
 })
 
 async function getData(e) {
     e.preventDefault();
-    let url = "";
+    let configs;
     //dataSet1
-    url = buildURL(dataSet1.value, 0);
-    let results1 = await fetchData(url).then(d => dataPoints[dataSet1.value].parse(d.data));
-    if (dataSet1.value != "Household Income")
-        appendNewChild(results, 'span', {html: dataPoints[dataSet1.value].format(results1), style: "white-space: pre-line;"});
-    console.log(results1);
+    configs = buildURL(dataSet1.value, 0);
+    let fetchResults = await fetchData(configs.URL).then(d => dataPoints[dataSet1.value].parse(d.data, configs.Config));
+    console.log(fetchResults);
+    appendNewChild(results, 'span', {html: dataPoints[dataSet1.value].format(fetchResults), style: "white-space: pre-line;"});
+    configs = buildURL(dataSet2.value, 0);
+    fetchResults = await fetchData(configs.URL).then(d => dataPoints[dataSet2.value].parse(d.data, configs.Confg));
+    appendNewChild(results, 'span', {html: dataPoints[dataSet2.value].format(fetchResults), style: "white-space: pre-line;"});
 }
 
 function buildURL(datapoint, index) {
+    let retObj = {};
+    retObj.Config = {};
     let drilldowns = [];
     drilldowns = undefined;
     drilldowns = dataPoints[datapoint].drilldowns;
@@ -59,6 +69,11 @@ function buildURL(datapoint, index) {
             drilldowns.push("State");
             break;
     }
+    switch (filters[index].value) {
+        case "Occupations":
+            retUrl += `${occupations.apiCall(subfilters[index].value)}`;
+            retObj.Config.Occ = subfilters[index].value;
+    }
     let drillString = '&drilldowns=';
     for (let drill of drilldowns) {
         drillString += drill + ',';
@@ -67,6 +82,7 @@ function buildURL(datapoint, index) {
         drillString = drillString.substring(0, drillString.length - 1);
     if (!retUrl.includes('&Year='))
         retUrl += "&Year=latest";
-    return retUrl + ((drillString==`&drilldowns=`) ? '' : drillString);
+    retObj.URL = retUrl + ((drillString==`&drilldowns=`) ? '' : drillString);
+    return retObj;
 }
 
