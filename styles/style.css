@@ -1,4 +1,23 @@
-#main-content, #comp-bg{
+#scope {
+    display: block;
+    justify-items: center;
+    margin: 0 auto;
+    margin-top: 10px;
+}
+#submit {
+    display: fixed;
+    left: 50%
+}
+
+#filters-div{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+#left-div, #right-div {
     display: flex;
     flex-direction: column;
     justify-content: center;

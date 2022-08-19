@@ -43,7 +43,6 @@ function formatValue(value, type, includeSymbol = true) {
     let fs;
     switch (type) {
         case "money":
-            console.log(value);
             value = value.toString();
             fs = value.lastIndexOf('.');
             if (fs > 0)
@@ -57,7 +56,6 @@ function formatValue(value, type, includeSymbol = true) {
                     value = value.substring(0, commaCounter + 1) + `,` + value.substring(commaCounter + 1);
                 }
             }
-            console.log(value);
             return (includeSymbol) ? `$${value}` : parseFloat(value);
         case "percentage":
             let percent = (value[0]/value[1]*100).toString();

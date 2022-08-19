@@ -7,41 +7,34 @@
     <script> const baseURL = { URL: "https://datausa.io/api/data?", Priority: 0 };</script>
     <script src="src/tools.js"></script>
     <script src="src/dataFiles/refs.js"></script>
+    <script src="src/dataPoints.js"></script>
     <script src="src/dataFiles/filters.js"></script>
     <script src="src/index.js"></script>
 </head>
 <body>
     <div id="main-content">
-        <div id="comp-bg">
-            <div id="comp-labels">
-
-            </div>
-            <div id="scope-div">
-                <select id="scope">
-                    <option value="National">National</option>
-                    <option value="All_States">All States</option>
-                    <option value="Single_State">Single State</option>
-
-                </select>
-            </div>
-            <div id="data-sets-div">
-                <select id="data-set-1"></select>
-                <select id="data-set-2"></select>
-            </div>
-            <div id="filter-div">
-                <select id="filter-1"></select>
-                <select id="filter-2"></select>
-            </div>
-            <div id="sub-filter-div">
-                <select id="sub-filter-1"></select>
-                <select id="sub-filter-2"></select>
-            </div>
-            <div id="states-div" class="hidden">
+        <div id="scope-div">
+            <select id="scope">
+                <option value="National">National</option>
+                <option value="All_States">All States</option>
+                <option value="Single_State">Single State</option>
+            </select>
+        </div>
+        <div id="filters-div">
+            <div id="left-div">
+                <select name="dataset" id="data-set-1"></select>
+                <select name="filter" id="filter-1"></select>
+                <select name="subfilter" id="sub-filter-1"></select>
                 <select id="states-1"></select>
+            </div>
+            <div id="right-div">
+                <select name="dataset" id="data-set-2"></select>
+                <select name="filter" id="filter-2"></select>
+                <select name="subfilter" id="sub-filter-2"></select>
                 <select id="states-2"></select>
             </div>
         </div>
-        <div>
+        <div id="submit-div">
             <button type="submit" id="submit">Get Data</button>
         </div>
         <div style="height:20%">

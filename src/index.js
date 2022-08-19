@@ -1,3 +1,4 @@
+let dataSets;
 let dataSet1;
 let dataSet2;
 let scope;
@@ -10,12 +11,13 @@ let stateSelects;
 
 document.addEventListener("DOMContentLoaded", () => {
     //Get necessary elements from DOM
+    dataSets = Array.from(document.querySelectorAll('select[name="dataset"]')); 
     dataSet1 = document.querySelector('#data-set-1');
     dataSet2 = document.querySelector('#data-set-2');
     scope = document.querySelector('#scope');
-    filters = Array.from(document.querySelectorAll('#filter-div select'));
-    subfilters = Array.from(document.querySelectorAll('#sub-filter-div select'));
-    stateSelects = document.querySelectorAll('#states-div select');
+    filters = Array.from(document.querySelectorAll('select[name="filter"]'));
+    subfilters = Array.from(document.querySelectorAll('select[name="subfilter"]'));
+    //stateSelects = document.querySelectorAll('select');
     results = document.querySelector('#results');
     submit = document.querySelector('#submit');
     submit.addEventListener('click', (e) => getData(e));
@@ -24,12 +26,12 @@ document.addEventListener("DOMContentLoaded", () => {
     dataSet2.addEventListener('change', dataPointChange);
     filters[0].addEventListener('change', subFilterChange);
     filters[1].addEventListener('change', subFilterChange);
-
     //Populate the dropdowns
-    populateSelect(dataSet1, dataPoints);
-    populateSelect(dataSet2, dataPoints);
-    populateSelect(stateSelects[0], states);
-    populateSelect(stateSelects[1], states);
+    
+    populateSelect(dataSets[0], dataPoints);
+    populateSelect(dataSets[1], dataPoints);
+    // populateSelect(stateSelects[0], states);
+    // populateSelect(stateSelects[1], states);
     populateSelect(filters[0], ["Occupations", "States"]);
     populateSelect(filters[1], ["Occupations", "States"]);
     populateSelect(subfilters[0], occupations);
@@ -42,10 +44,9 @@ async function getData(e) {
     //dataSet1
     configs = buildURL(dataSet1.value, 0);
     let fetchResults = await fetchData(configs.URL).then(d => dataPoints[dataSet1.value].parse(d.data, configs.Config));
-    console.log(fetchResults);
     appendNewChild(results, 'span', {html: dataPoints[dataSet1.value].format(fetchResults), style: "white-space: pre-line;"});
-    configs = buildURL(dataSet2.value, 0);
-    fetchResults = await fetchData(configs.URL).then(d => dataPoints[dataSet2.value].parse(d.data, configs.Confg));
+    configs = buildURL(dataSet2.value, 1);
+    fetchResults = await fetchData(configs.URL).then(d => dataPoints[dataSet2.value].parse(d.data, configs.Config));
     appendNewChild(results, 'span', {html: dataPoints[dataSet2.value].format(fetchResults), style: "white-space: pre-line;"});
 }
 
@@ -72,7 +73,8 @@ function buildURL(datapoint, index) {
     switch (filters[index].value) {
         case "Occupations":
             retUrl += `${occupations.apiCall(subfilters[index].value)}`;
-            retObj.Config.Occ = subfilters[index].value;
+            retObj.Config.Subject = subfilters[index].value;
+            //retObj.Config.Occ = subfilters[index].value;
     }
     let drillString = '&drilldowns=';
     for (let drill of drilldowns) {
