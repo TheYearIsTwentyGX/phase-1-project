@@ -43,7 +43,8 @@ async function getData(e) {
     let configs;
     //dataSet1
     configs = buildURL(dataSet1.value, 0);
-    let fetchResults = await fetchData(configs.URL).then(d => dataPoints[dataSet1.value].parse(d.data, configs.Config));
+    console.log(configs);
+    let fetchResults = await fetchData(configs.URL).then(d => {console.log(d.data); dataPoints[dataSet1.value].parse(d.data, configs.Config)});
     appendNewChild(results, 'span', {html: dataPoints[dataSet1.value].format(fetchResults), style: "white-space: pre-line;"});
     configs = buildURL(dataSet2.value, 1);
     fetchResults = await fetchData(configs.URL).then(d => dataPoints[dataSet2.value].parse(d.data, configs.Config));
@@ -53,11 +54,11 @@ async function getData(e) {
 function buildURL(datapoint, index) {
     let retObj = {};
     retObj.Config = {};
-    let drilldowns = [];
-    drilldowns = undefined;
+    let drilldowns = undefined;
     drilldowns = dataPoints[datapoint].drilldowns;
     if (drilldowns == undefined)
         drilldowns = [];
+    console.log(drilldowns);
     let retUrl = dataPoints.apiCall(datapoint);
     switch (scope.value) {
         case "Single_State":

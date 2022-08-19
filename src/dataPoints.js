@@ -87,5 +87,13 @@ const dataPoints = {
             }
             return retStr;
         }
+    },
+    "Wage Distribution": {
+        arg: "Workforce Status=true&measure=Total Population,Record Count",
+        drilldowns: ["Wage Bin"],
+        URL: UrlStyles.Basic,
+        parse: function(...args) {
+            console.log(args);
+        }
     }
 }
