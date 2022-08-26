@@ -1,6 +1,7 @@
-const dataPoints = {
+dataPoints = {
     apiCall: function(point) {
-        return this[point].URL + this[point].arg;
+        let retPoint = this[point].URL + this[point].arg;
+        return retPoint;
     },
     "Average Wage": {
         arg: "measure=Average%20Wage",
@@ -21,7 +22,7 @@ const dataPoints = {
         format: function(results) {
             let retStr = '';
             for (let state of results) {
-                retStr += `Average wage ${(state.Occ != undefined) ? `of ${state.Subject}` : ''} in ${(state.State == undefined) ? 'the United States' : state.State } is ${formatValue(state.Wage, "money", true)}\n\n`;
+                retStr += `Average wage ${(state.Subject != "All") ? `of ${state.Subject}` : ''} in ${(state.State == undefined) ? 'the United States' : state.State } is ${formatValue(state.Wage, "money", true)}\n\n`;
             }
             return retStr;
         }
@@ -42,9 +43,11 @@ const dataPoints = {
                 obj.State = demVotes[i].State;
                 if (args[1].Subject != undefined)
                     obj.Subject = args[1].Subject;
+                console.log([demVotes[i]["Candidate Votes"], demVotes[i]["Candidate Votes"] + repVotes[i]["Candidate Votes"]]);
                 obj.Results = formatValue([demVotes[i]["Candidate Votes"], demVotes[i]["Candidate Votes"] + repVotes[i]["Candidate Votes"]], "percentage", false);
                 retObj.push(obj);
             }
+            console.log(retObj);
             return retObj;
         },
         format: function(results) {
@@ -67,6 +70,40 @@ const dataPoints = {
             return retStr;
         }
     },
+    "Health": {
+        URL: UrlStyles.Basic,
+        parse: function(...args) {
+            let retObj = [];
+            console.log
+            for (let state of args[0]) {
+                let obj = {};
+                obj.State = state.State;
+                obj[args[1].Subject] = state[args[1].measure];
+                obj.arg = args[1].display;
+                obj.arg.name = subfilters[currentIndex].value;
+                retObj.push(obj);
+            }
+            return retObj;
+        },
+        format: function(results) {
+            // console.log(results);
+            let retStr = '';
+            for (let state of results) {
+                switch (state.arg.type) {
+                    case "per100k":
+                        retStr += `${state.State} had ${formatValue(state[state.arg.name], "per100k")} cases of ${state.arg.name.replace('Rate', '')} per 100,000 citizens.\n\n`
+                        break;
+                    default:
+                        if (state.arg.specialFormat === undefined)
+                            retStr += `The rate of ${state.arg.name} in ${state.State} is ${formatValue(state[state.arg.name], state.arg.type, true)}\n\n`;
+                        else
+                            retStr += state.arg.specialFormat.replace('$1', formatValue(state[state.arg.name], state.arg.type, true)).replace('$2', state.State);
+                        break;
+                }
+            }
+            return retStr;
+        }
+    },
     "Household Income": {
         arg: "measure=Household%20Income",
         URL: UrlStyles.Basic,
@@ -75,7 +112,7 @@ const dataPoints = {
             for (let state of args[0]) {
                 let obj = {};
                 obj.State = state.State;
-                obj["Household Income"] = state["Household Income"];
+                obj["Household Income"] = formatValue(state["Household Income"], "percentage", false);
                 retObj.push(obj);
             }
             return retObj;

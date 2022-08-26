@@ -2,30 +2,45 @@ const ignoreProps = ["apiCall", "generalData"];
 
 function scopeChange(e) {
     if (e.target.value == "Single_State") {
-        document.querySelector('#states-div').classList = '';
+        document.querySelector("#states-1").classList = '';
+        document.querySelector("#states-2").classList = '';
     }
     else {
-        document.querySelector('#states-div').classList = 'hidden';
+        document.querySelector("#states-1").classList = 'hidden';
+        document.querySelector("#states-2").classList = 'hidden';
     }
 }
 
+function reloadArgs() {
+    if (dataSets[currentIndex].value === "Health")
+        dataPoints["Health"].arg = (function() { return `measure=${health[filters[currentIndex].value][subfilters[currentIndex].value].measure}`; })();
+}
+
 function dataPointChange(e) {
-    let dataSet = (e.target == dataSet1) ? dataSet1 : dataSet2;
-    let filterSelect = (e.target == dataSet1) ? filters[0] : filters[1];
-    switch (dataSet.value) {
+    currentIndex = dataSets.indexOf(e.target);
+    switch (dataSets[currentIndex].value) {
         case "Average Wage":
-            populateSelect(filterSelect, ["Occupations", "States"])
-            filterSelect.classList = '';
+            populateSelect(filters[currentIndex], ["Occupations"]);
+            subFilterChange(filters[currentIndex].value);
             break;
+        case "Health":
+            populateSelect(filters[currentIndex], Object.keys(health));
+            subFilterChange(dataSets[currentIndex].value);
     }
 }
 function subFilterChange(e) {
-    let subfilter = subfilters[filters.indexOf(e.target)];
-    switch (e.target.value) {
+    let mainFilter = (e.target != undefined) ? e.target.value : e;
+    switch (mainFilter) {
         case "Occupations":
-            populateSelect(subfilter, occupations);
-            subfilter.classList = '';
+            populateSelect(subfilters[currentIndex], occupations);
+            subfilters[currentIndex].classList = '';
             break;
+        case "Health":
+        case "Healthcare":
+        case "Health Risks":
+        case "Mental Health":
+        case "Social Needs":
+            populateSelect(subfilters[currentIndex], Object.keys(health[filters[currentIndex].value]));
     }
 }
 
@@ -41,6 +56,7 @@ function populateSelect(select, keys) {
 
 function formatValue(value, type, includeSymbol = true) {
     let fs;
+    let percent = "";
     switch (type) {
         case "money":
             value = value.toString();
@@ -57,9 +73,30 @@ function formatValue(value, type, includeSymbol = true) {
                 }
             }
             return (includeSymbol) ? `$${value}` : parseFloat(value);
-        case "percentage":
-            let percent = (value[0]/value[1]*100).toString();
+        case "per100k":
+            value = value.toString();
+            fs = value.lastIndexOf('.');
+            value = value.substring(0, fs);
+            return value;
+        case "preformattedPercentage":
+            percent = value.toString();
             fs = percent.lastIndexOf('.');
+            if (percent[fs + 2] === '0' && percent[fs + 1] === '0')
+                fs -= 3;
+            else if (percent[fs + 2] === '0')
+                fs -= 1;
+            percent = percent.substring(0, fs + 3);
+            return (includeSymbol) ? `${percent}%` : parseFloat(percent);
+        case "percentage":
+            if (value[1] === undefined)
+                percent = (value * 100).toString();
+            else
+                percent = (value[0]/value[1]*100).toString();
+            fs = percent.lastIndexOf('.');
+            if (percent[fs + 2] === '0' && percent[fs + 1] === '0')
+                fs -= 3;
+            else if (percent[fs + 2] === '0')
+                fs -= 1;
             percent = percent.substring(0, fs + 3);
             return (includeSymbol) ? `${percent}%` : parseFloat(percent);
     }

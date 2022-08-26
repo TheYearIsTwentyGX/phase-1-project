@@ -5,8 +5,8 @@
     <title>Document</title>
     <link rel="stylesheet" href="styles/style.css">
     <script> const baseURL = { URL: "https://datausa.io/api/data?", Priority: 0 };</script>
-    <script src="src/tools.js"></script>
     <script src="src/dataFiles/refs.js"></script>
+    <script src="src/tools.js"></script>
     <script src="src/dataPoints.js"></script>
     <script src="src/dataFiles/filters.js"></script>
     <script src="src/index.js"></script>
@@ -25,13 +25,13 @@
                 <select name="dataset" id="data-set-1"></select>
                 <select name="filter" id="filter-1"></select>
                 <select name="subfilter" id="sub-filter-1"></select>
-                <select id="states-1"></select>
+                <select name="states" id="states-1" class="hidden"></select>
             </div>
             <div id="right-div">
                 <select name="dataset" id="data-set-2"></select>
                 <select name="filter" id="filter-2"></select>
                 <select name="subfilter" id="sub-filter-2"></select>
-                <select id="states-2"></select>
+                <select name="states" id="states-2" class="hidden"></select>
             </div>
         </div>
         <div id="submit-div">

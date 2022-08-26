@@ -10,11 +10,89 @@ const occupations = {
     "Software Developers": 151252
 }
 
+health = {
+    "Healthcare": {
+        "Adults Who Haven't Seen a Doctor in the Past 12 Months Due to Cost": {
+            measure: "Adults Who Haven't Seen a Doctor in the Past 12 Months Due to Cost",
+            type: "preformattedPercentage",
+            specialFormat: "$1 of adults in $2 haven't seen a doctor in the past 12 months due to cost.\n\n"
+        },
+        "Adults with Mental Illness Utilizing Mental Health Services": {
+            measure: "Mental Health Service Use Among Adults With Mental Illness",
+            type: "preformattedPercentage",
+            specialFormat: "$1 of adults in $2 with mental illness utilize mental health services.\n\n"
+        },
+        "30-Day Hospital Readmission Rate Among Medicare Patients": {
+            measure: "30-Day Hospital Readmission Rate Among Medicare Patients",
+            type: "per100k",
+        }
+    },
+    "Health Risks": {
+        "Adult Obesity": {
+			measure: "Adult Obesity",
+			type: "percentage"
+		},
+		"Adult Smoking": {
+			measure: "Adult Smoking",
+			type: "percentage"
+		},
+		"Alcohol-Impaired Driving Fatalities": {
+			measure: "Alcohol-Impaired Driving Deaths",
+			type: "percentage"
+		},
+		"Diabetes": {
+			measure: "Diabetes Prevalence",
+			type: "percentage"
+		},
+		"HIV": {
+			measure: "Hiv Prevalence",
+			type: "per100k"
+		},
+		"Homicides": {
+			measure: "Homicides",
+			type: "preformattedPercentage"
+		},
+		"Car Crash Fatalities": {
+			measure: "Motor Vehicle Crash Deaths",
+			type: "preformattedPercentage"
+		},
+		"STI's": {
+			measure: "Sexually Transmitted Infections",
+			type: "per100k"
+		},
+		"Violent Crime": {
+			measure: "Violent Crime",
+            type: "per100k"
+        }
+    },
+    "Mental Health": {
+        "Adults with Major Depression": {
+			measure: "Adults With Major Depressive Episode",
+			type: "preformattedPercentage"
+		},
+		"Adults with Serious Mental Illness": {
+			measure: "Adults With Serious Mental Illness",
+			type: "preformattedPercentage"
+		},
+		"Drug Overdose Fatalities": {
+			measure: "Drug Overdose Death Rate Per 100,000 Age-Adjusted",
+			type: "preformattedPercentage"
+		},
+		"Alcoholism": {
+			measure: "Excessive Drinking",
+			type: "percentage"
+		},
+		"Opioid Fatalities": {
+			measure: "Opioid Overdose Death Rate Per 100,000 Age-Adjusted",
+			type: "percentage"
+		}
+    }
+}
+
 const states = {
     apiCall: function(state) {
         return `State=${this[state].id}`;
     },
-    All: {},
     Alabama: {
         id: "04000US01"
     },
