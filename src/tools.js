@@ -1,4 +1,4 @@
-const ignoreProps = ["apiCall", "generalData"];
+const ignoreProps = ["apiCall", "generalData", "scopes"];
 
 function scopeChange(e) {
     if (e.target.value == "Single_State") {
@@ -24,7 +24,7 @@ function dataPointChange(e) {
             subFilterChange(filters[currentIndex].value);
             break;
         case "Health":
-            populateSelect(filters[currentIndex], Object.keys(health));
+            populateSelect(filters[currentIndex], health.getFilters());
             subFilterChange(dataSets[currentIndex].value);
     }
 }

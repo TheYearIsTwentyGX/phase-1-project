@@ -1,17 +1,30 @@
 const occupations = {
     apiCall: function(occ) {
-        return (occ == "All") ? '' : `&PUMS Occupation=${this[occ]}`;
+        return (occ == "All") ? '' : `&PUMS Occupation=${this[occ].id}`;
     },
     generalData: {
         URL: UrlStyles.Basic
     },
     "All": "",
-    "Police Officers": 333050,
+    "Police Officers": {
+        id: 333050,
+    },
     "Software Developers": 151252
 }
 
 health = {
+    getFilters: function() { 
+        let keys = Object.keys(health);
+        keys = keys.filter(x => {
+            if (this[x].scopes != undefined)
+                if (this[x].scopes.includes(scope.value))
+                    return true;
+            return false;
+        });
+        return keys;
+    },
     "Healthcare": {
+        scopes: ["National","All States", "Single State"],
         "Adults Who Haven't Seen a Doctor in the Past 12 Months Due to Cost": {
             measure: "Adults Who Haven't Seen a Doctor in the Past 12 Months Due to Cost",
             type: "preformattedPercentage",
@@ -28,6 +41,7 @@ health = {
         }
     },
     "Health Risks": {
+        scopes: ["All States", "Single State"],
         "Adult Obesity": {
 			measure: "Adult Obesity",
 			type: "percentage"
@@ -66,6 +80,7 @@ health = {
         }
     },
     "Mental Health": {
+        scopes: ["National","All States", "Single State"],
         "Adults with Major Depression": {
 			measure: "Adults With Major Depressive Episode",
 			type: "preformattedPercentage"

@@ -32,15 +32,17 @@ async function getData(e) {
     results.innerHTML = '';
     let configs;
     //dataSet1
-    configs = buildURL(dataSets[0].value, 0);
+    currentIndex = 0;
+    configs = buildURL(dataSets[0].value);
     let fetchResults = await fetchData(configs.URL).then(d => {console.log(d); return dataPoints[dataSet1.value].parse(d.data, configs.Config)});
     appendNewChild(results, 'span', {html: dataPoints[dataSet1.value].format(fetchResults), style: "white-space: pre-line;"});
-    configs = buildURL(dataSets[1].value, 1);
+    currentIndex = 1;
+    configs = buildURL(dataSets[1].value);
     fetchResults = await fetchData(configs.URL).then(d => dataPoints[dataSet2.value].parse(d.data, configs.Config));
     appendNewChild(results, 'span', {html: dataPoints[dataSet2.value].format(fetchResults), style: "white-space: pre-line;"});
 }
 
-function buildURL(datapoint, index) {
+function buildURL(datapoint) {
     reloadArgs();
     let retObj = {};
     retObj.Config = {};
@@ -51,7 +53,7 @@ function buildURL(datapoint, index) {
     let retUrl = dataPoints.apiCall(datapoint);
     switch (scope.value) {
         case "Single_State":
-            retUrl += `&${states.apiCall(stateSelects[index].value)}`;
+            retUrl += `&${states.apiCall(stateSelects[currentIndex].value)}`;
             break;
         case "National":
             break;
@@ -59,17 +61,17 @@ function buildURL(datapoint, index) {
             drilldowns.push("State");
             break;
     }
-    switch (filters[index].value) {
+    switch (filters[currentIndex].value) {
         case "Occupations":
-            retUrl += `${occupations.apiCall(subfilters[index].value)}`;
+            retUrl += `${occupations.apiCall(subfilters[currentIndex].value)}`;
             break;
-            //retObj.Config.Occ = subfilters[index].value;
+            //retObj.Config.Occ = subfilters[currentIndex].value;
         }
     if (dataSets[currentIndex].value === "Health") {
         retObj.Config.measure = health[filters[currentIndex].value][subfilters[currentIndex].value].measure;
         retObj.Config.display = health[filters[currentIndex].value][subfilters[currentIndex].value];
     }
-    retObj.Config.Subject = subfilters[index].value;
+    retObj.Config.Subject = subfilters[currentIndex].value;
     let drillString = '&drilldowns=';
     for (let drill of drilldowns) {
         drillString += drill + ',';
