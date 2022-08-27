@@ -233,6 +233,38 @@ const states = {
     Rhode_Island: {
         id: "04000US44"
     },
-    
+    South_Carolina: {
+        id: "04000US45"
+    },
+    South_Dakota: {
+        id: "04000US46"
+    },
+    Tennessee: {
+        id: "04000US47"
+    },
+    Texas: {
+        id: "04000US48"
+    },
+    Utah: {
+        id: "04000US49"
+    },
+    Vermont: {
+        id: "04000US50"
+    },
+    Virginia: {
+        id: "04000US51"
+    },
+    Washington: {
+        id: "04000US53"
+    },
+    West_Virginia: {
+        id: "04000US54"
+    },
+    Wisconsin: {
+        id: "04000US55"
+    },
+    Wyoming: {
+        id: "04000US56"
+    },
 }
 

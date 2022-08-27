@@ -13,7 +13,7 @@ dataPoints = {
                 let obj = {};
                 obj.State = state.State;
                 if (args[1].Subject != undefined)
-                    obj.Subject = args[1].Subject;
+                obj.Subject = args[1].Subject;
                 obj.Wage = formatValue(state["Average Wage"], "money", false);
                 retObj.push(obj);
             }
@@ -43,7 +43,6 @@ dataPoints = {
                 obj.State = demVotes[i].State;
                 if (args[1].Subject != undefined)
                     obj.Subject = args[1].Subject;
-                console.log([demVotes[i]["Candidate Votes"], demVotes[i]["Candidate Votes"] + repVotes[i]["Candidate Votes"]]);
                 obj.Results = formatValue([demVotes[i]["Candidate Votes"], demVotes[i]["Candidate Votes"] + repVotes[i]["Candidate Votes"]], "percentage", false);
                 retObj.push(obj);
             }
@@ -65,7 +64,7 @@ dataPoints = {
                 }
                 let prefix = (state.Subject != undefined) ? `${state.Subject} in ` : '';
                 if (state.State == undefined) state.State = "the United States";
-                retStr += `<span>${prefix}${state.State} voted</span><span style="color: ${rgb};">${color.toUpperCase()} (${state.Results}%)</span>\n\n`
+                    retStr += `<span>${prefix}${state.State} voted</span><span style="color: ${rgb};">${color.toUpperCase()} (${state.Results}%)</span>\n\n`
             }
             return retStr;
         }
@@ -74,7 +73,6 @@ dataPoints = {
         URL: UrlStyles.Basic,
         parse: function(...args) {
             let retObj = [];
-            console.log
             for (let state of args[0]) {
                 let obj = {};
                 obj.State = state.State;
@@ -86,19 +84,18 @@ dataPoints = {
             return retObj;
         },
         format: function(results) {
-            // console.log(results);
             let retStr = '';
             for (let state of results) {
                 switch (state.arg.type) {
                     case "per100k":
-                        retStr += `${state.State} had ${formatValue(state[state.arg.name], "per100k")} cases of ${state.arg.name.replace('Rate', '')} per 100,000 citizens.\n\n`
-                        break;
+                    retStr += `${state.State} had ${formatValue(state[state.arg.name], "per100k")} cases of ${state.arg.name.replace('Rate', '')} per 100,000 citizens.\n\n`
+                    break;
                     default:
-                        if (state.arg.specialFormat === undefined)
-                            retStr += `The rate of ${state.arg.name} in ${state.State} is ${formatValue(state[state.arg.name], state.arg.type, true)}\n\n`;
-                        else
-                            retStr += state.arg.specialFormat.replace('$1', formatValue(state[state.arg.name], state.arg.type, true)).replace('$2', state.State);
-                        break;
+                    if (state.arg.specialFormat === undefined)
+                    retStr += `The rate of ${state.arg.name} in ${state.State} is ${formatValue(state[state.arg.name], state.arg.type, true)}\n\n`;
+                    else
+                    retStr += state.arg.specialFormat.replace('$1', formatValue(state[state.arg.name], state.arg.type, true)).replace('$2', state.State);
+                    break;
                 }
             }
             return retStr;
