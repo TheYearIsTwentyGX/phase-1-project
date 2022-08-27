@@ -4,20 +4,16 @@
     margin: 0 auto;
     margin-top: 10px;
 }
-#submit {
-    display: fixed;
-    left: 50%
-}
-
-#filters-div{
-    display: flex;
-    flex-direction: row;
+#submit, select, table {
+    display: block;
+    justify-items: center;
     justify-content: center;
-    align-content: center;
-    align-items: center;
+    justify-self: center;
+    margin: 0 auto;
+    margin-top: 10px;
 }
 
-#left-div, #right-div {
+#main-content{
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -25,25 +21,18 @@
     align-items: center;
 }
 
+
 body {
     margin: 0%;
     padding: 0%;
     background-color: rgb(48,52,63);
 }
 
-#comparers {
-    display: inline-flex;
-    flex-direction: row-reverse;
-    justify-content: center;
-    align-content: center;
-    align-items: center;
-}
-
 .hidden {
     display: none;
 }
 
-#results-bg {
+#results-bg, #results {
     width: 100%
 }
 
@@ -53,12 +42,12 @@ body {
     text-align: center;
     color: lightslategray;
 }
-
-select, #submit {
+/* 
+select {
     margin: 10px;
     margin-bottom: 8px;
     margin-top: 8px;
-}
+} */
 
 #comp-bg {
     width: 100%;

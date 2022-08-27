@@ -21,14 +21,14 @@ function dataPointChange(e) {
     switch (dataSets[currentIndex].value) {
         case "Average Wage":
             populateSelect(filters[currentIndex], ["Occupations"]);
-            subFilterChange(filters[currentIndex].value);
+            filterChange(filters[currentIndex].value);
             break;
         case "Health":
-            populateSelect(filters[currentIndex], health.getFilters());
-            subFilterChange(dataSets[currentIndex].value);
+            populateSelect(filters[currentIndex], Object.keys(health));
+            filterChange(dataSets[currentIndex].value);
     }
 }
-function subFilterChange(e) {
+function filterChange(e) {
     let mainFilter = (e.target != undefined) ? e.target.value : e;
     switch (mainFilter) {
         case "Occupations":
@@ -39,7 +39,7 @@ function subFilterChange(e) {
         case "Healthcare":
         case "Health Risks":
         case "Mental Health":
-        case "Social Needs":
+        case "Patient to Clinician Ratios":
             populateSelect(subfilters[currentIndex], Object.keys(health[filters[currentIndex].value]));
     }
 }
@@ -49,8 +49,11 @@ function populateSelect(select, keys) {
     select.innerHTML = '';
     let options = (Array.isArray(keys)) ? keys : Object.keys(keys);
     for (const option of options) {
-        if (!ignoreProps.includes(option))
-            appendNewChild(select, 'option', {value: option, text: option.replace("_", " ")});
+        if (ignoreProps.includes(option))
+            continue;
+        if (health[option] != undefined && health[option].scopes != undefined && (!health[option].scopes.includes(scope.value)))
+                    continue;
+        appendNewChild(select, 'option', {value: option, text: option.replace("_", " ")});
     }
 }
 
@@ -99,11 +102,14 @@ function formatValue(value, type, includeSymbol = true) {
                 fs -= 1;
             percent = percent.substring(0, fs + 3);
             return (includeSymbol) ? `${percent}%` : parseFloat(percent);
+        default:
+            return value;
     }
 } 
 
 //Just used to simplify fetch requests
 async function fetchData(url) {
+    submit.disabled = true;
     return await fetch(url)
     .then(d => d.json());
 }
