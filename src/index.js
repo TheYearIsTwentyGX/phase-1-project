@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
     scope.addEventListener('change', scopeChange);
     dataSets[0].addEventListener('change', dataPointChange);
     dataSets[1].addEventListener('change', dataPointChange);
-    filters[0].addEventListener('change', subFilterChange);
-    filters[1].addEventListener('change', subFilterChange);
+    filters[0].addEventListener('change', filterChange);
+    filters[1].addEventListener('change', filterChange);
     //Populate the dropdowns
     
     populateSelect(dataSets[0], dataPoints);
@@ -40,6 +40,7 @@ async function getData(e) {
     configs = buildURL(dataSets[1].value);
     fetchResults = await fetchData(configs.URL).then(d => dataPoints[dataSet2.value].parse(d.data, configs.Config));
     appendNewChild(results, 'span', {html: dataPoints[dataSet2.value].format(fetchResults), style: "white-space: pre-line;"});
+    submit.disabled = false;
 }
 
 function buildURL(datapoint) {

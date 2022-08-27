@@ -13,18 +13,8 @@ const occupations = {
 }
 
 health = {
-    getFilters: function() { 
-        let keys = Object.keys(health);
-        keys = keys.filter(x => {
-            if (this[x].scopes != undefined)
-                if (this[x].scopes.includes(scope.value))
-                    return true;
-            return false;
-        });
-        return keys;
-    },
     "Healthcare": {
-        scopes: ["National","All States", "Single State"],
+        scopes: ["National","All_States", "Single_State"],
         "Adults Who Haven't Seen a Doctor in the Past 12 Months Due to Cost": {
             measure: "Adults Who Haven't Seen a Doctor in the Past 12 Months Due to Cost",
             type: "preformattedPercentage",
@@ -41,7 +31,7 @@ health = {
         }
     },
     "Health Risks": {
-        scopes: ["All States", "Single State"],
+        scopes: ["All_States", "Single_State"],
         "Adult Obesity": {
 			measure: "Adult Obesity",
 			type: "percentage"
@@ -80,7 +70,7 @@ health = {
         }
     },
     "Mental Health": {
-        scopes: ["National","All States", "Single State"],
+        scopes: ["National","All_States", "Single_State"],
         "Adults with Major Depression": {
 			measure: "Adults With Major Depressive Episode",
 			type: "preformattedPercentage"
@@ -101,6 +91,24 @@ health = {
 			measure: "Opioid Overdose Death Rate Per 100,000 Age-Adjusted",
 			type: "percentage"
 		}
+    },
+    "Patient to Clinician Ratios": {
+        scopes: ["All_States", "Single_State"],
+        "Patient to Primary Care Physician": {
+            measure: "Patient to Primary Care Physician Ratio",
+            type: "ratio",
+            specialFormat: "There are $1 patients for every Primary Care Physician in $2\n\n"
+        },
+        "Patient to Dentist":{
+            measure: "Patient to Dentist Ratio",
+            type: "ratio",
+            specialFormat: "There are $1 patients for every Dentist in $2\n\n"
+        },
+        "Patient to Mental Health Provider":{
+            measure: "Patient to Mental Health Provider Ratio",
+            type: "ratio",
+            specialFormat: "There are $1 patients for every Mental Health Provider in $2\n\n"
+        },
     }
 }
 
@@ -194,6 +202,37 @@ const states = {
     },
     New_Hampshire: {
         id: "04000US33"
-    }
+    },
+    New_Jersey: {
+        id: "04000US34"
+    },
+    New_Mexico : {
+        id: "04000US35"
+    },
+    New_York: {
+        id: "04000US36"
+    },
+    North_Carolina: {
+        id: "04000US37"
+    },
+    North_Dakota: {
+        id: "04000US38"
+    },
+    Ohio: {
+        id: "04000US39"
+    },
+    Oklahoma: {
+        id: "04000US40"
+    },
+    Oregon: {
+        id: "04000US41"
+    },
+    Pennsylvania: {
+        id: "04000US42"
+    },
+    Rhode_Island: {
+        id: "04000US44"
+    },
+    
 }
 
