@@ -33,25 +33,27 @@ async function getData(e) {
     e.preventDefault();
     results.innerHTML = '';
     let configs = {};
-
-    //Get first set of data
-    currentIndex = 0;
-    configs = buildURL(dataSets[0].value);
-    fetchResults = await fetchData(configs.URL)
-        .then(d => {
-            console.log(d); 
-            return dataPoints[dataSet1.value]
-                .parse(d.data, configs.Config)
-        });
-    appendNewChild(results, 'span', {html: dataPoints[dataSet1.value].format(fetchResults), style: "white-space: pre-line;"});
-
-    //Get second set of data
-    currentIndex = 1;
-    configs = {};
-    configs = buildURL(dataSets[1].value);
-    fetchResults = await fetchData(configs.URL)
-        .then(d => dataPoints[dataSet2.value].parse(d.data, configs.Config));
-    appendNewChild(results, 'span', {html: dataPoints[dataSet2.value].format(fetchResults), style: "white-space: pre-line;"});
+    let tableRows = [];
+    //Loop once for each set of data
+    for (let counter = 0; counter < 2; counter++) {
+        //0 = left col, 1 = right col
+        currentIndex = counter;
+        //Get the URL to fetch along with the configuration
+        configs = buildURL(dataSets[currentIndex].value);
+        fetchResults = await fetchData(configs.URL)
+            .then(d => dataPoints[dataSets[currentIndex].value].parse(d.data, configs.Config)); //Parse the data down to the info we need
+        //Formatting mostly just gets the color based on their ranking
+        for (let i = 0; i < fetchResults.length; i++) {
+            if (ignoreStates.includes(fetchResults[i].loc))
+                continue;
+            let currentRow;
+            currentRow = (currentIndex === 0) ? appendNewChild(results, 'tr') : tableRows[i];
+            let valString = `<span>${fetchResults[i].text.replace(fetchResults[i].formattedValue, `<span style='width:49%; color:${fetchResults[i].color}'>${fetchResults[i].formattedValue}</span>`)}</span>`;
+            appendNewChild(currentRow, 'td', {html: valString, style: "white-space: pre-line;"});
+            if (currentIndex === 0)
+                tableRows.push(currentRow);
+        }
+    }
     submit.disabled = false;
 }
 

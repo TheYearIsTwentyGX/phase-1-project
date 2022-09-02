@@ -1,5 +1,3 @@
-const ignoreProps = ["apiCall", "generalData", "scopes"];
-
 function scopeChange(e) {
     if (e.target.value == "Single_State") {
         document.querySelector("#states-1").classList = '';
@@ -9,11 +7,6 @@ function scopeChange(e) {
         document.querySelector("#states-1").classList = 'hidden';
         document.querySelector("#states-2").classList = 'hidden';
     }
-}
-
-function reloadArgs() {
-    if (dataSets[currentIndex].value === "Health")
-        dataPoints["Health"].arg = (function() { return `measure=${health[filters[currentIndex].value][subfilters[currentIndex].value].measure}`; })();
 }
 
 function dataPointChange(e) {
@@ -42,6 +35,14 @@ function filterChange(e) {
         case "Patient to Clinician Ratios":
             populateSelect(subfilters[currentIndex], Object.keys(health[filters[currentIndex].value]));
     }
+}
+
+function sortResults(a, b) {
+    if (a.value > b.value)
+        return 1;
+    if (a.value < b.value)
+        return -1;
+    return 0;
 }
 
 //Function to populate the dropdowns

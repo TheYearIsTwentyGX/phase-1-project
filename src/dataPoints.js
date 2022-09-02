@@ -8,24 +8,28 @@ dataPoints = {
         drilldowns: [],
         URL: UrlStyles.Basic,
         parse: function(...args) {
-            retObj = [];
-            for (let state of args[0]) {
+            retArr = [];
+            for (let location of args[0]) {
+                if (ignoreStates.includes(location.State))
+                    continue;
                 let obj = {};
-                obj.State = state.State;
+                obj.loc = (location.State != undefined) ? location.State : "the United States";
                 if (args[1].Subject != undefined)
-                obj.Subject = args[1].Subject;
-                obj.Wage = formatValue(state["Average Wage"], "money", false);
-                retObj.push(obj);
+                    obj.subject = args[1].Subject;
+                obj.value = formatValue(location["Average Wage"], "money", false);
+                obj.formattedValue = formatValue(location["Average Wage"], "money", true);
+                obj.text = `The average wage ${(obj.subject != "All") ? `of ${obj.subject} ` : ''}in ${obj.loc} is ${obj.formattedValue}`;
+                retArr.push(obj);
             }
-            return retObj;
+            let sortedResults = [...retArr];
+            sortedResults.sort(sortResults);
+            for (let location of retArr) {
+                location.rank = sortedResults.indexOf(location)/retArr.length;
+                let hue = (location.rank*120).toString(10);
+                location.color = `hsl(${hue},100%,50%)`;
+            }
+            return retArr;
         },
-        format: function(results) {
-            let retStr = '';
-            for (let state of results) {
-                retStr += `Average wage ${(state.Subject != "All") ? `of ${state.Subject}` : ''} in ${(state.State == undefined) ? 'the United States' : state.State } is ${formatValue(state.Wage, "money", true)}\n\n`;
-            }
-            return retStr;
-        }
     },
     "Election Results": {
         arg: "cube=Data_USA_President_election&Year=2020&measures=Candidate+Votes&Party=Democratic,Republican",
@@ -39,32 +43,55 @@ dataPoints = {
             let totalRepVotes = repVotes.reduce((prev, curr) => prev + curr["Candidate Votes"], 0);
             const demWinner = (totalDemVotes > totalRepVotes);
             for (let i = 0; i < demVotes.length; i++) {
+                if (ignoreStates.includes(demVotes[i].State))
+                    continue;
                 let obj = {};
-                obj.State = demVotes[i].State;
+                obj.loc = demVotes[i].State;
                 if (args[1].Subject != undefined)
-                    obj.Subject = args[1].Subject;
-                obj.Results = formatValue([demVotes[i]["Candidate Votes"], demVotes[i]["Candidate Votes"] + repVotes[i]["Candidate Votes"]], "percentage", false);
+                    obj.subject = args[1].Subject;
+                obj.value = formatValue([demVotes[i]["Candidate Votes"], demVotes[i]["Candidate Votes"] + repVotes[i]["Candidate Votes"]], "percentage", false);
+                let color = 'purple';
+                if (obj.value > 60) {
+                    color = 'blue';
+                    obj.color = 'rgb(50,50,255)';
+                }
+                else if (obj.value < 40) {
+                    color = 'red';
+                    obj.color = 'rgb(255,50,50)';
+                }
+                else {
+                    if (obj.value > 50)
+                        obj.color = `rgb(150,77,255)`;
+                    else
+                        obj.color = `rgb(255,77,150)`;
+                }
+                obj.formattedValue = `${color.toUpperCase()} (${formatValue(obj.value, "preformattedPercentage", true)})`;
+                obj.text = `${obj.subject != "All" ? `${obj.subject} in `: ''}${obj.loc} voted ${obj.formattedValue}`;
                 retObj.push(obj);
+            }
+            let sortedArr = [...retObj].sort(sortResults);
+            for (let loc of retObj) {
+                loc.rank = sortedArr.indexOf(loc);
             }
             console.log(retObj);
             return retObj;
         },
         format: function(results) {
             let retStr = '';
-            for (let state of results) {
+            for (let location of results) {
                 let color = 'purple';
                 let rgb = 'rgb(190,40,190)';
-                if (state.Results > 60) {
+                if (location.Results > 60) {
                     color = 'blue';
                     rgb = 'lightblue';
                 }
-                else if (state.Results < 40){
+                else if (location.Results < 40){
                     color = 'red';
                     rgb = 'rgb(160,50,50)';
                 }
-                let prefix = (state.Subject != undefined) ? `${state.Subject} in ` : '';
-                if (state.State == undefined) state.State = "the United States";
-                    retStr += `<span>${prefix}${state.State} voted</span><span style="color: ${rgb};">${color.toUpperCase()} (${state.Results}%)</span>\n\n`
+                let prefix = (location.Subject != undefined) ? `${location.Subject} in ` : '';
+                if (location.State == undefined) location.State = "the United States";
+                    retStr += `<span>${prefix}${location.State} voted</span><span style="color: ${rgb};">${color.toUpperCase()} (${location.Results}%)</span>\n\n`
             }
             return retStr;
         }
@@ -73,10 +100,10 @@ dataPoints = {
         URL: UrlStyles.Basic,
         parse: function(...args) {
             let retObj = [];
-            for (let state of args[0]) {
+            for (let location of args[0]) {
                 let obj = {};
-                obj.State = state.State;
-                obj[args[1].Subject] = state[args[1].measure];
+                obj.State = location.State;
+                obj[args[1].Subject] = location[args[1].measure];
                 obj.arg = args[1].display;
                 obj.arg.name = subfilters[currentIndex].value;
                 retObj.push(obj);
@@ -85,16 +112,16 @@ dataPoints = {
         },
         format: function(results) {
             let retStr = '';
-            for (let state of results) {
-                switch (state.arg.type) {
+            for (let location of results) {
+                switch (location.arg.type) {
                     case "per100k":
-                    retStr += `${state.State} had ${formatValue(state[state.arg.name], "per100k")} cases of ${state.arg.name.replace('Rate', '')} per 100,000 citizens.\n\n`
+                    retStr += `${location.State} had ${formatValue(location[location.arg.name], "per100k")} cases of ${location.arg.name.replace('Rate', '')} per 100,000 citizens.\n\n`
                     break;
                     default:
-                    if (state.arg.specialFormat === undefined)
-                    retStr += `The rate of ${state.arg.name} in ${state.State} is ${formatValue(state[state.arg.name], state.arg.type, true)}\n\n`;
+                    if (location.arg.specialFormat === undefined)
+                    retStr += `The rate of ${location.arg.name} in ${location.State} is ${formatValue(location[location.arg.name], location.arg.type, true)}\n\n`;
                     else
-                    retStr += state.arg.specialFormat.replace('$1', formatValue(state[state.arg.name], state.arg.type, true)).replace('$2', state.State);
+                    retStr += location.arg.specialFormat.replace('$1', formatValue(location[location.arg.name], location.arg.type, true)).replace('$2', location.State);
                     break;
                 }
             }
@@ -106,18 +133,18 @@ dataPoints = {
         URL: UrlStyles.Basic,
         parse: function(...args) {
             let retObj = [];
-            for (let state of args[0]) {
+            for (let location of args[0]) {
                 let obj = {};
-                obj.State = state.State;
-                obj["Household Income"] = formatValue(state["Household Income"], "percentage", false);
+                obj.State = location.State;
+                obj["Household Income"] = formatValue(location["Household Income"], "percentage", false);
                 retObj.push(obj);
             }
             return retObj;
         },
         format: function(results) {
             let retStr = '';
-            for (let state of results) {
-                retStr += `The average Household Income of ${state.State} is ${formatValue(state["Household Income"], "money", true)}.\n\n`;
+            for (let location of results) {
+                retStr += `The average Household Income of ${location.State} is ${formatValue(location["Household Income"], "money", true)}.\n\n`;
             }
             return retStr;
         }

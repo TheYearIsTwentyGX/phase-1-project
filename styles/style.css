@@ -4,7 +4,7 @@
     margin: 0 auto;
     margin-top: 10px;
 }
-#submit, select, table {
+#submit, select, #selectors {
     display: block;
     justify-items: center;
     justify-content: center;
@@ -31,23 +31,6 @@ body {
 .hidden {
     display: none;
 }
-
-#results-bg, #results {
-    width: 100%
-}
-
-#results p, span {
-    display: inline-block;
-    width: 49%;
-    text-align: center;
-    color: lightslategray;
-}
-/* 
-select {
-    margin: 10px;
-    margin-bottom: 8px;
-    margin-top: 8px;
-} */
 
 #comp-bg {
     width: 100%;
