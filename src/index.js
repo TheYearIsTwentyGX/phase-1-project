@@ -23,32 +23,35 @@ document.addEventListener("DOMContentLoaded", () => {
     populateSelect(dataSets[1], dataPoints);
     populateSelect(stateSelects[0], states);
     populateSelect(stateSelects[1], states);
-    populateSelect(filters[0], ["Occupations", "States"]);
-    populateSelect(filters[1], ["Occupations", "States"]);
-    populateSelect(subfilters[0], occupations);
-    populateSelect(subfilters[1], occupations);
+    populateSelect(filters[0], averageWageFilters);
+    populateSelect(filters[1], averageWageFilters);
+    populateSelect(subfilters[0], genders);
+    populateSelect(subfilters[1], genders);
+    for (let stateSelect of [...stateSelects, ...subfilters])
+        stateSelect.classList = 'hidden';
+    
 })
 
 async function getData(e) {
     e.preventDefault();
     results.innerHTML = '';
-    let configs = {};
     let tableRows = [];
     //Loop once for each set of data
     for (let counter = 0; counter < 2; counter++) {
+        let configs = undefined;
         //0 = left col, 1 = right col
         currentIndex = counter;
         //Get the URL to fetch along with the configuration
         configs = buildURL(dataSets[currentIndex].value);
         fetchResults = await fetchData(configs.URL)
-            .then(d => dataPoints[dataSets[currentIndex].value].parse(d.data, configs.Config)); //Parse the data down to the info we need
+            .then(d => { return parseData(d.data, configs.Config); return dataPoints[dataSets[currentIndex].value].parse(d.data, configs.Config)}); //Parse the data down to the info we need
         //Formatting mostly just gets the color based on their ranking
         for (let i = 0; i < fetchResults.length; i++) {
             if (ignoreStates.includes(fetchResults[i].loc))
                 continue;
             let currentRow;
             currentRow = (currentIndex === 0) ? appendNewChild(results, 'tr') : tableRows[i];
-            let valString = `<span>${fetchResults[i].text.replace(fetchResults[i].formattedValue, `<span style='width:49%; color:${fetchResults[i].color}'>${fetchResults[i].formattedValue}</span>`)}</span>`;
+            let valString = `<span>${fetchResults[i].text}</span>`;
             appendNewChild(currentRow, 'td', {html: valString, style: "white-space: pre-line;"});
             if (currentIndex === 0)
                 tableRows.push(currentRow);
@@ -78,25 +81,37 @@ function buildURL(datapoint) {
             drilldowns.push("State");
             break;
     }
-    //Add a drilldown if filter is Occupation
-    //I know having a switch statement here is overkill, but this is for expandability
-    switch (filters[currentIndex].value) {
-        case "Occupations":
-            retUrl += `${occupations.apiCall(subfilters[currentIndex].value)}`;
-            break;
-    }
     //Health ended up having some subfilters that were simply too long or not worded to my liking.
     //This sets a config property to what I want the property to actually be named, rather than the measure needed for the API
     if (dataSets[currentIndex].value === "Health") {
         retObj.Config.measure = health[filters[currentIndex].value][subfilters[currentIndex].value].measure;
         retObj.Config.display = health[filters[currentIndex].value][subfilters[currentIndex].value];
     }
-    retObj.Config.Subject = subfilters[currentIndex].value;
+    
+    retObj.Config.display = subfilters[currentIndex].value;
+    if (filters[currentIndex].classList != 'hidden') {
+        switch (filters[currentIndex].value) {
+            case "Occupations":
+                retUrl += occupations.apiCall(subfilters[currentIndex].value);
+                break;
+            case "Gender":
+                retUrl += genders.apiCall(subfilters[currentIndex].value);
+                retObj.Config.display = (subfilters[currentIndex].value == "Male") ? "men" : "women";
+                break;
+            case "Race":
+                retUrl += race.apiCall(subfilters[currentIndex].value);
+                retObj.Config.display = subfilters[currentIndex].value + 's';
+                break;
+            case "No Filter":
+                retObj.Config.display = undefined;
+        }
+    }
     //Add the needed drilldowns to the URL
     //This avoids having to always check if a drilldown is the first drilldown when adding it
     let drillString = '&drilldowns=';
     for (let drill of drilldowns) {
-        drillString += drill + ',';
+        if (!drillString.includes(drill))
+            drillString += drill + ',';
     }
     if (drillString.endsWith(','))
         drillString = drillString.substring(0, drillString.length - 1);
@@ -108,3 +123,43 @@ function buildURL(datapoint) {
     return retObj;
 }
 
+function parseData(...data) {
+    let retArr = [];
+    if (data[0].length >= 100) {
+        let reducedArr = [];
+        for (let i = 0; i < data[0].length/2; i += 1) {
+            if (ignoreStates.includes(data[0][i].State))
+                continue;
+            reducedArr.push([data[0][i], data[0][i+(data[0].length/2)]]);
+        }
+        data[0] = reducedArr;
+    }
+    for (let location of data[0]) {
+        let obj = {};
+        if (ignoreStates.includes(location.State))
+            continue;
+        obj.loc = (location.State == undefined) ? location[0].State : location.State;
+        if (data[1].display != undefined)
+            obj.display = data[1].display;
+        dataPoints[dataSets[currentIndex].value].specialParse(obj, location, data[1]);
+        retArr.push(obj);
+    }
+    let sortedArr = [...retArr].sort(sortResults);
+    if (sortedArr[0].reverseSort == true)
+        sortedArr.reverse();
+    for (let location of retArr) {
+        location.rank = sortedArr.indexOf(location);
+        switch (dataPoints[dataSets[currentIndex].value].colorStyle) {
+            case "Red-Green":
+                location.color = `hsl(${((location.rank/sortedArr.length)*120).toString(10)},100%,50%)`;
+                break;
+        }
+        if (sortedArr.length == 1)
+            location.color = 'rgb(200,198,175)';
+        location.text = location.text
+            .replace("$value", `<span style='width:49%; color:${location.color};'>${location.formattedValue}</span>`)
+            .replace("$display", (location.display != undefined) ? ` of ${location.display}` : '')
+            .replace("$loc", location.loc);
+    }
+    return retArr;
+}

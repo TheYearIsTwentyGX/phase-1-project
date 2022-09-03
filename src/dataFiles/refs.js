@@ -7,6 +7,8 @@ let scope;
 let stateSelects;
 let subfilters = [ {value: undefined} ];
 let submit;
+const averageWageFilters = ["No Filter", "Gender", "Occupations", "Race"];
+const povertyFilters = ["No Filter", "Gender", "Race"];
 
 const ignoreProps = ["apiCall", "generalData", "scopes"];
 const ignoreStates = ["District of Columbia", "Puerto Rico"];
@@ -23,7 +25,7 @@ function reloadArgs() {
 
 /* PROPERTIES
 loc
-subject
+display
 value
 formattedValue
 text
@@ -31,3 +33,9 @@ text
 rank
 color
 */
+
+/* PROPS SET IN specialParse
+    formattedValue
+    value
+    text (using $display, $loc, and $value)
+ */

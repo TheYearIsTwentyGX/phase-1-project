@@ -13,28 +13,55 @@ function dataPointChange(e) {
     currentIndex = dataSets.indexOf(e.target);
     switch (dataSets[currentIndex].value) {
         case "Average Wage":
-            populateSelect(filters[currentIndex], ["Occupations"]);
+            populateSelect(filters[currentIndex], averageWageFilters);
             filterChange(filters[currentIndex].value);
             break;
         case "Health":
             populateSelect(filters[currentIndex], Object.keys(health));
             filterChange(dataSets[currentIndex].value);
+            break;
+        case "Poverty Levels":
+            populateSelect(filters[currentIndex], povertyFilters);
+            filterChange(filters[currentIndex].value);
+            break;
+        default:
+            populateSelect(filters[currentIndex], "Empty");
+            filterChange(dataSets[currentIndex].value);
+            break;
     }
 }
 function filterChange(e) {
-    let mainFilter = (e.target != undefined) ? e.target.value : e;
+    let mainFilter = e;
+    if (e.target != undefined) {
+        mainFilter = e.target.value
+        currentIndex = filters.indexOf(e.target);
+    }
+    let keyList = undefined;
     switch (mainFilter) {
         case "Occupations":
-            populateSelect(subfilters[currentIndex], occupations);
-            subfilters[currentIndex].classList = '';
+            keyList = occupations;
+            break;
+        case "Election Results":
+            keyList = "Empty";
+            break;
+        case "Gender":
+            keyList = genders;
+            break;
+        case "Race":
+            keyList = race;
             break;
         case "Health":
         case "Healthcare":
         case "Health Risks":
         case "Mental Health":
         case "Patient to Clinician Ratios":
-            populateSelect(subfilters[currentIndex], Object.keys(health[filters[currentIndex].value]));
+            keyList = Object.keys(health[filters[currentIndex].value]);
+            break;
+        default:
+            keyList = "Empty";
+            break;
     }
+    populateSelect(subfilters[currentIndex], keyList);
 }
 
 function sortResults(a, b) {
@@ -48,6 +75,12 @@ function sortResults(a, b) {
 //Function to populate the dropdowns
 function populateSelect(select, keys) {
     select.innerHTML = '';
+    if (keys == "Empty") {
+        select.classList = "hidden";
+        return;
+    }
+    else
+        select.classList = '';
     let options = (Array.isArray(keys)) ? keys : Object.keys(keys);
     for (const option of options) {
         if (ignoreProps.includes(option))
@@ -61,52 +94,53 @@ function populateSelect(select, keys) {
 function formatValue(value, type, includeSymbol = true) {
     let fs;
     let percent = "";
+    value = toHundredths(value);
     switch (type) {
         case "money":
-            value = value.toString();
             fs = value.lastIndexOf('.');
-            if (fs > 0)
-                value = value.substring(0, fs + 3);
-            else
+            if (fs == -1)
                 fs = value.length;
             let commaCounter = fs - 1;
-            if (includeSymbol) {
+            let formattedValue = value;
                 while (commaCounter > 2) {
                     commaCounter -= 3;
-                    value = value.substring(0, commaCounter + 1) + `,` + value.substring(commaCounter + 1);
+                    formattedValue = formattedValue.substring(0, commaCounter + 1) + `,` + formattedValue.substring(commaCounter + 1);
                 }
-            }
-            return (includeSymbol) ? `$${value}` : parseFloat(value);
+            return [`$${formattedValue}`, parseFloat(value)];
         case "per100k":
-            value = value.toString();
-            fs = value.lastIndexOf('.');
-            value = value.substring(0, fs);
-            return value;
+            return [`${value} of every 100k`, parseFloat(value)];
         case "preformattedPercentage":
-            percent = value.toString();
-            fs = percent.lastIndexOf('.');
-            if (percent[fs + 2] === '0' && percent[fs + 1] === '0')
-                fs -= 3;
-            else if (percent[fs + 2] === '0')
-                fs -= 1;
-            percent = percent.substring(0, fs + 3);
-            return (includeSymbol) ? `${percent}%` : parseFloat(percent);
+            return [`${value}%`, parseFloat(value)];
         case "percentage":
-            if (value[1] === undefined)
+            console.log(value);
+            // if (value[1] === undefined)
                 percent = (value * 100).toString();
-            else
-                percent = (value[0]/value[1]*100).toString();
+            // else
+            //     percent = (value[0]/value[1]*100).toString();
             fs = percent.lastIndexOf('.');
             if (percent[fs + 2] === '0' && percent[fs + 1] === '0')
                 fs -= 3;
             else if (percent[fs + 2] === '0')
                 fs -= 1;
             percent = percent.substring(0, fs + 3);
-            return (includeSymbol) ? `${percent}%` : parseFloat(percent);
+            return [`${percent}%`, parseFloat(percent)];
         default:
-            return value;
+            return [value, value];
     }
-} 
+}
+
+function toHundredths(value) {
+    value = value.toString();
+    let fs = value.lastIndexOf('.');
+    if (value.length > fs + 2 && fs != -1) {
+        value = value.substring(0, fs + 3);
+        if (value[fs + 3] === '0' && value[fs + 2] === '0')
+            value = value.substring(0, fs);
+        else if (value[fs + 3] === '0')
+            value = value.substring(0, fs + 2);
+    }
+    return value;
+}
 
 //Just used to simplify fetch requests
 async function fetchData(url) {
