@@ -2,7 +2,6 @@
     display: block;
     justify-items: center;
     margin: 0 auto;
-    margin-top: 10px;
 }
 #submit, select, #selectors {
     display: block;
@@ -12,7 +11,10 @@
     margin: 0 auto;
     margin-top: 10px;
 }
-
+h4, h2 {
+    margin: 0;
+    padding: 0;
+}
 #main-content{
     display: flex;
     flex-direction: column;

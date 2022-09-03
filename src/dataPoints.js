@@ -26,7 +26,6 @@ dataPoints = {
             const demWinner = (demVotes > repVotes);
             let value;
             value = formatValue((demWinner) ? demVotes/(demVotes+repVotes)*100 : repVotes/(demVotes+repVotes)*100, "preformattedPercentage");
-            console.log(value[1]);
             obj.value = value[1];
             obj.formattedValue = value[0];
             switch (demWinner) {

@@ -145,10 +145,8 @@ function parseData(...data) {
         retArr.push(obj);
     }
     let sortedArr = [...retArr].sort(sortResults);
-    console.log(sortedArr);
     if (sortedArr[0].reverseSort == true) {
         sortedArr.reverse();
-        console.log("reversing");
     }
     let prevValue = 0;
     for (let location of retArr) {
