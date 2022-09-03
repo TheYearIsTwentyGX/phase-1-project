@@ -65,6 +65,14 @@ function filterChange(e) {
 }
 
 function sortResults(a, b) {
+    if (a.value.toString().lastIndexOf('.') != -1 || (b.value.toString().lastIndexOf('.') != -1)) {
+        a.value = parseFloat(a.value);
+        b.value = parseFloat(b.value);
+    }
+    else {
+        a.value = parseInt(a.value);
+        b.value = parseInt(b.value);
+    }
     if (a.value > b.value)
         return 1;
     if (a.value < b.value)
@@ -96,6 +104,10 @@ function formatValue(value, type, includeSymbol = true) {
     let percent = "";
     value = toHundredths(value);
     switch (type) {
+        case "largeNumber": 
+            let fVal = addCommas(value);
+            return [fVal, value];
+        break;
         case "money":
             fs = value.lastIndexOf('.');
             if (fs == -1)
@@ -140,6 +152,19 @@ function toHundredths(value) {
             value = value.substring(0, fs + 2);
     }
     return value;
+}
+
+function addCommas(value) {
+    let fs = value.lastIndexOf('.');
+    if (fs == -1)
+        fs = value.length;
+    let commaCounter = fs - 1;
+    let formattedValue = value;
+        while (commaCounter > 2) {
+            commaCounter -= 3;
+            formattedValue = formattedValue.substring(0, commaCounter + 1) + `,` + formattedValue.substring(commaCounter + 1);
+        }
+    return formattedValue;
 }
 
 //Just used to simplify fetch requests

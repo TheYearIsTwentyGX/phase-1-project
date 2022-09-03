@@ -8,7 +8,6 @@ dataPoints = {
         drilldowns: [],
         URL: UrlStyles.Basic,
         colorStyle: "Red-Green",
-        sortByIntVal: true,
         specialParse: function(obj, loc) {
             let value = formatValue(loc["Average Wage"], "money");
             obj.formattedValue = value[0];
@@ -82,6 +81,15 @@ dataPoints = {
     },
     "Poverty Levels": {
         arg: "measure=Poverty%20Population",
+        URL: UrlStyles.Basic,
+        colorStyle: "Red-Green",
+        specialParse: function(obj, loc) {
+            let value = formatValue(loc["Poverty Population"], "largeNumber");
+            obj.formattedValue = value[0];
+            obj.value = value[1];
+            obj.text = `In $loc, $value of $display are in poverty.`;
+            obj.reverseSort = true;
+        }
     }
 }
 

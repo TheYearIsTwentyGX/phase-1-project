@@ -29,21 +29,21 @@ const occupations = {
 }
 
 const genders = {
-    apiCall: function(gender) {
-        return "&Gender=" + this[gender];
+    apiCall: function(gender, datapoint) {
+        return "&Gender=" + this[gender](datapoint);
     },
-    Male: 1,
-    Female: 2
+    Male: function(datapoint) { return (datapoint == "Average Wage") ? 1 : 0;},
+    Female: function(datapoint) { return (datapoint == "Average Wage") ? 2 : 1;}
 }
 
 const race = {
-    apiCall: function(race) {
-        return "&Race=" + this[race];
+    apiCall: function(race, datapoint) {
+        return "&Race=" + this[race](datapoint);
     },
-    White: 1,
-    Black: 2,
-    American_Indian: 3,
-    Asian: 6
+    White: function(datapoint) { return 1;},
+    Black: function(datapoint) { return 2;},
+    Native_American: function(datapoint) { return 3;},
+    Asian: function(datapoint) { return (datapoint == "Average Wage") ? 6 : 4;}
 }
 
 health = {

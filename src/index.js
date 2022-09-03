@@ -95,11 +95,11 @@ function buildURL(datapoint) {
                 retUrl += occupations.apiCall(subfilters[currentIndex].value);
                 break;
             case "Gender":
-                retUrl += genders.apiCall(subfilters[currentIndex].value);
+                retUrl += genders.apiCall(subfilters[currentIndex].value, dataSets[currentIndex].value);
                 retObj.Config.display = (subfilters[currentIndex].value == "Male") ? "men" : "women";
                 break;
             case "Race":
-                retUrl += race.apiCall(subfilters[currentIndex].value);
+                retUrl += race.apiCall(subfilters[currentIndex].value, dataSets[currentIndex].value);
                 retObj.Config.display = subfilters[currentIndex].value + 's';
                 break;
             case "No Filter":
@@ -145,8 +145,12 @@ function parseData(...data) {
         retArr.push(obj);
     }
     let sortedArr = [...retArr].sort(sortResults);
-    if (sortedArr[0].reverseSort == true)
+    console.log(sortedArr);
+    if (sortedArr[0].reverseSort == true) {
         sortedArr.reverse();
+        console.log("reversing");
+    }
+    let prevValue = 0;
     for (let location of retArr) {
         location.rank = sortedArr.indexOf(location);
         switch (dataPoints[dataSets[currentIndex].value].colorStyle) {
