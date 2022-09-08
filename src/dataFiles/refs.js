@@ -22,20 +22,3 @@ function reloadArgs() {
     if (dataSets[currentIndex].value === "Health")
         dataPoints["Health"].arg = (function() { return `measure=${health[filters[currentIndex].value][subfilters[currentIndex].value].measure}`; })();
 }
-
-/* PROPERTIES
-loc
-display
-value
-formattedValue
-text
-
-rank
-color
-*/
-
-/* PROPS SET IN specialParse
-    formattedValue
-    value
-    text (using $display, $loc, and $value)
- */

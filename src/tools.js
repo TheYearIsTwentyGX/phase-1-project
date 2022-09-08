@@ -80,6 +80,11 @@ function sortResults(a, b) {
     return 0;
 }
 
+function dataGetError() {
+    submit.disabled = false;
+    alert("There was an error with the data request. Please try again.");
+}
+
 //Function to populate the dropdowns
 function populateSelect(select, keys) {
     select.innerHTML = '';

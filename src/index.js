@@ -44,7 +44,13 @@ async function getData(e) {
         //Get the URL to fetch along with the configuration
         configs = buildURL(dataSets[currentIndex].value);
         fetchResults = await fetchData(configs.URL)
-            .then(d => { return parseData(d.data, configs.Config); return dataPoints[dataSets[currentIndex].value].parse(d.data, configs.Config)}); //Parse the data down to the info we need
+        //If the data array is of zero length, then we passed a bad URL to the API
+            .then(d => {
+                if (d.data.length == 0)
+                    throw currentIndex;
+            })
+            .then(d => { return parseData(d.data, configs.Config); return dataPoints[dataSets[currentIndex].value].parse(d.data, configs.Config)}) //Parse the data down to the info we need
+            .catch(e => { console.log(e); dataGetError(); });
         //Formatting mostly just gets the color based on their ranking
         for (let i = 0; i < fetchResults.length; i++) {
             if (ignoreStates.includes(fetchResults[i].loc))
