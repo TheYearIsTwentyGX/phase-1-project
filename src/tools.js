@@ -1,3 +1,4 @@
+//Shows or hides the individual State dropdowns based on the scope
 function scopeChange(e) {
     if (e.target.value == "Single_State") {
         document.querySelector("#states-1").classList = '';
@@ -8,7 +9,7 @@ function scopeChange(e) {
         document.querySelector("#states-2").classList = 'hidden';
     }
 }
-
+//When the Data Point is changed, this function updates the filters dropdowns
 function dataPointChange(e) {
     currentIndex = dataSets.indexOf(e.target);
     switch (dataSets[currentIndex].value) {
@@ -30,6 +31,7 @@ function dataPointChange(e) {
             break;
     }
 }
+//When the Main Filter is changed, this function updates the subfilter dropdowns
 function filterChange(e) {
     let mainFilter = e;
     if (e.target != undefined) {
@@ -64,6 +66,7 @@ function filterChange(e) {
     populateSelect(subfilters[currentIndex], keyList);
 }
 
+//Custom sorter for data from the fetch request
 function sortResults(a, b) {
     if (a.value.toString().lastIndexOf('.') != -1 || (b.value.toString().lastIndexOf('.') != -1)) {
         a.value = parseFloat(a.value);
@@ -80,6 +83,7 @@ function sortResults(a, b) {
     return 0;
 }
 
+//Error handler for fetch requests
 function dataGetError() {
     submit.disabled = false;
     alert("There was an error with the data request. Please try again.");
@@ -104,15 +108,18 @@ function populateSelect(select, keys) {
     }
 }
 
+//Format data for the table to a displayable value (eg, 15231.01251 -> $15,231.01)
 function formatValue(value, type, includeSymbol = true) {
     let fs;
     let percent = "";
     value = toHundredths(value);
     switch (type) {
+        //Just for large numbers. Useful for populations or stats shown in X per 100,000
         case "largeNumber": 
             let fVal = addCommas(value);
             return [fVal, value];
         break;
+        //Format as a dollar amount
         case "money":
             fs = value.lastIndexOf('.');
             if (fs == -1)
@@ -124,17 +131,19 @@ function formatValue(value, type, includeSymbol = true) {
                     formattedValue = formattedValue.substring(0, commaCounter + 1) + `,` + formattedValue.substring(commaCounter + 1);
                 }
             return [`$${formattedValue}`, parseFloat(value)];
+        //Generic output for stats that are shown in X per 100,000
         case "per100k":
             return [`${value} of every 100k`, parseFloat(value)];
+        //This really just adds a percentage sign to the end of the value
         case "preformattedPercentage":
             return [`${value}%`, parseFloat(value)];
+        //This is for percentages that are given as a fraction of 1 (eg, 0.5 -> 50%)
         case "percentage":
-            console.log(value);
-            // if (value[1] === undefined)
-                percent = (value * 100).toString();
-            // else
-            //     percent = (value[0]/value[1]*100).toString();
+            //Multiply by 100 to get a percentage
+            percent = (value * 100).toString();
+            //Get the index of the decimal point (I called this fs for 'full stop')
             fs = percent.lastIndexOf('.');
+            //This cuts off ending zeroes
             if (percent[fs + 2] === '0' && percent[fs + 1] === '0')
                 fs -= 3;
             else if (percent[fs + 2] === '0')
@@ -146,6 +155,7 @@ function formatValue(value, type, includeSymbol = true) {
     }
 }
 
+//Cuts down decimals to 2 places
 function toHundredths(value) {
     value = value.toString();
     let fs = value.lastIndexOf('.');
@@ -159,6 +169,7 @@ function toHundredths(value) {
     return value;
 }
 
+//Formats numbers with commas
 function addCommas(value) {
     let fs = value.lastIndexOf('.');
     if (fs == -1)

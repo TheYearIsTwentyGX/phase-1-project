@@ -1,8 +1,6 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => { //Event listener type 1 (DOMContentLoaded)
     //Get necessary elements from DOM
     dataSets = Array.from(document.querySelectorAll('select[name="dataset"]')); 
-    dataSet1 = document.querySelector('#data-set-1');
-    dataSet2 = document.querySelector('#data-set-2');
     scope = document.querySelector('#scope');
     filters = Array.from(document.querySelectorAll('select[name="filter"]'));
     subfilters = Array.from(document.querySelectorAll('select[name="subfilter"]'));
@@ -11,8 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
     submit = document.querySelector('#submit');
 
     //Event Listeners
-    submit.addEventListener('click', (e) => getData(e));
-    scope.addEventListener('change', scopeChange);
+    submit.addEventListener('click', (e) => getData(e)); //Event listener type 2 (click)
+    scope.addEventListener('change', scopeChange); //Event listener type 3 (change)
     dataSets[0].addEventListener('change', dataPointChange);
     dataSets[1].addEventListener('change', dataPointChange);
     filters[0].addEventListener('change', filterChange);
@@ -27,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     populateSelect(filters[1], averageWageFilters);
     populateSelect(subfilters[0], genders);
     populateSelect(subfilters[1], genders);
+    //Hide the state dropdowns by default
     for (let stateSelect of [...stateSelects, ...subfilters])
         stateSelect.classList = 'hidden';
     
@@ -44,14 +43,15 @@ async function getData(e) {
         //Get the URL to fetch along with the configuration
         configs = buildURL(dataSets[currentIndex].value);
         fetchResults = await fetchData(configs.URL)
-        //If the data array is of zero length, then we passed a bad URL to the API
-            .then(d => {
+            .then(d => { 
+                //Since the API won't give us an error for an invalid URL, I check the lenghth of the data returned to see if it's valid
                 if (d.data.length == 0)
                     throw currentIndex;
-            })
-            .then(d => { return parseData(d.data, configs.Config); return dataPoints[dataSets[currentIndex].value].parse(d.data, configs.Config)}) //Parse the data down to the info we need
+                //Parse the data down to the info we need
+                return parseData(d.data, configs.Config); 
+            }) 
             .catch(e => { console.log(e); dataGetError(); });
-        //Formatting mostly just gets the color based on their ranking
+        //Based on the parsed data, output the results to the #results table on the DOM
         for (let i = 0; i < fetchResults.length; i++) {
             if (ignoreStates.includes(fetchResults[i].loc))
                 continue;
@@ -94,6 +94,8 @@ function buildURL(datapoint) {
         retObj.Config.display = health[filters[currentIndex].value][subfilters[currentIndex].value];
     }
     
+    //This gets the current filters and subfilters and adds them to the URL based on the selection
+    //It also passes on the way that I'd like to display the selected subject based on the subfilter (men/women instead of Male/Female)
     retObj.Config.display = subfilters[currentIndex].value;
     if (filters[currentIndex].classList != 'hidden') {
         switch (filters[currentIndex].value) {
@@ -104,6 +106,7 @@ function buildURL(datapoint) {
                 retUrl += genders.apiCall(subfilters[currentIndex].value, dataSets[currentIndex].value);
                 retObj.Config.display = (subfilters[currentIndex].value == "Male") ? "men" : "women";
                 break;
+            //I don't like the way it refers to races, but as a white person myself, I thought it better to leave it as the API gave it to me.
             case "Race":
                 retUrl += race.apiCall(subfilters[currentIndex].value, dataSets[currentIndex].value);
                 retObj.Config.display = subfilters[currentIndex].value + 's';
@@ -119,11 +122,13 @@ function buildURL(datapoint) {
         if (!drillString.includes(drill))
             drillString += drill + ',';
     }
+    //Remove the trailing comma
     if (drillString.endsWith(','))
         drillString = drillString.substring(0, drillString.length - 1);
     //I have to specifically check if Year has been added because Election Results won't accept latest. You have to specify the actual election year.
     if (!retUrl.includes('&Year='))
         retUrl += "&Year=latest";
+    //Put all parts of the URL together
     retObj.URL = retUrl + ((drillString==`&drilldowns=`) ? '' : drillString);
     console.log(retObj.URL);
     return retObj;
@@ -131,6 +136,8 @@ function buildURL(datapoint) {
 
 function parseData(...data) {
     let retArr = [];
+    //This is used to condense data that has multiple entries for the same state down to a single state.
+    //One example is for Election Results, where it gives me the results for each party for each state as separate entries in the returned array.
     if (data[0].length >= 100) {
         let reducedArr = [];
         for (let i = 0; i < data[0].length/2; i += 1) {
@@ -140,21 +147,32 @@ function parseData(...data) {
         }
         data[0] = reducedArr;
     }
+    //Parse down the data to remove unnecessary information. 
+    //I also format the data to be more universal, such as changing the specific name of the statistic to "value", which is necessary for the sort function located in tools.js
     for (let location of data[0]) {
         let obj = {};
+        //Not every statistic has data for DC/Puerto Rico, so I always ignore those 2 locations to ensure that they don't misalign the displayed table.
         if (ignoreStates.includes(location.State))
             continue;
         obj.loc = (location.State == undefined) ? location[0].State : location.State;
         if (data[1].display != undefined)
             obj.display = data[1].display;
+        //Do the portion of parsing that is specific to this dataPoint
         dataPoints[dataSets[currentIndex].value].specialParse(obj, location, data[1]);
         retArr.push(obj);
     }
+    //Sort the array of parsed data, reversing it if specified by the filter or subfilter
+    //I know it's wasteful to include the reverseSort variable with every single object,
+        //but by the time I realized I would have to reverse the sort for certain stats, I had already rewritten large portions of the project too many times to do it again for this.
+        //Realistically, the best way to do this would be to get a config object from each dataPoint/filter/subfilter dropdown that specifies how to sort the data.
+        //Using that, I'd also have that object specify how to do the special parsing for each, making the code more DRY.
     let sortedArr = [...retArr].sort(sortResults);
     if (sortedArr[0].reverseSort == true) {
         sortedArr.reverse();
     }
-    let prevValue = 0;
+    //Based on the sorted array, find where each location ranks in this stat, then color the stat based on that rank and the colorStyle specified by the dataPoint
+    //I added a property to specify the rank which goes unused, this is for a cut feature that I didn't have the time to implement.
+    //When I return to this project later, I will utilize this stat to show the correlation between the 2 sets of data.
     for (let location of retArr) {
         location.rank = sortedArr.indexOf(location);
         switch (dataPoints[dataSets[currentIndex].value].colorStyle) {
@@ -164,6 +182,7 @@ function parseData(...data) {
         }
         if (sortedArr.length == 1)
             location.color = 'rgb(200,198,175)';
+        //Do the final formatting of the text, replacing placeholder strings within the dataPoint's display string with the actual data.
         location.text = location.text
             .replace("$value", `<span style='width:49%; color:${location.color};'>${location.formattedValue}</span>`)
             .replace("$display", (location.display != undefined) ? ` of ${location.display}` : '')

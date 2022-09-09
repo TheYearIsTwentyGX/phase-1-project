@@ -1,10 +1,10 @@
+//List of occupations. Used for the occupations filter/subfilter
 const occupations = {
+    //apiCall builds the argument for the API call.
     apiCall: function(occ) {
         return (occ == "All") ? '' : `&PUMS Occupation=${this[occ]}`;
     },
-    generalData: {
-        URL: UrlStyles.Basic
-    },
+    //Supported occupations
     "Bartenders": 353011,
     "Biological Scientists": 191020,
     "Clergy": 212011,
@@ -29,24 +29,34 @@ const occupations = {
 }
 
 const genders = {
+    //apiCall builds the argument for the API call.
     apiCall: function(gender, datapoint) {
         return "&Gender=" + this[gender](datapoint);
     },
+    //For some god forsaken reason, the API uses zero-indexed values for the Average Wage dataPoint, but uses one-indexed values for poverty rates.
+    //I didn't build this in a super expandable way, but using a switch statement for this seemed like overkill for now.
     Male: function(datapoint) { return (datapoint == "Average Wage") ? 1 : 0;},
     Female: function(datapoint) { return (datapoint == "Average Wage") ? 2 : 1;}
 }
 
 const race = {
+    //apiCall builds the argument for the API call.
     apiCall: function(race, datapoint) {
         return "&Race=" + this[race](datapoint);
     },
     White: function(datapoint) { return 1;},
     Black: function(datapoint) { return 2;},
+    //Despite stating in 'buildURL' that I wanted to avoid making any changes having to do with race, the API forced me to make one here.
+    //Depending on the dataPoint, this race is referred to as either "Native American" or "American Indian", so I had to make a gut choice here.
+    //Apologies to anyone unhappy with this decision
     Native_American: function(datapoint) { return 3;},
+    //Like with genders, the Race ID is not identical between different dataPoints.
     Asian: function(datapoint) { return (datapoint == "Average Wage") ? 6 : 4;}
 }
 
 health = {
+    //You'll notice that the apiCall function is missing here. The URL for the health data is different from the other dataPoints, so I had to build it separately.
+    //I also had to use the 'specialFormat' property to specify how to format each subfilter, since the stat is provided in different formats based on the subfilter (X per 100k residents, percentages, X per 100k incidents, etc.)
     "Healthcare": {
         scopes: ["National","All_States", "Single_State"],
         "Adults Who Haven't Seen a Doctor in the Past 12 Months Due to Cost": {

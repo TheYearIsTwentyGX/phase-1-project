@@ -1,13 +1,26 @@
 dataPoints = {
+    //This gets the base URL based off the dataPoint dropdowns selected
     apiCall: function(point) {
         let retPoint = this[point].URL + this[point].arg;
         return retPoint;
     },
+    //I'm only commenting the first section, since they all have identical structure
     "Average Wage": {
+        //This gets the 'measure=' argument for the URL
         arg: "measure=Average%20Wage",
+        //This gets any drilldowns that are necessary for the dataPoint
         drilldowns: [],
+        //This gets the style of URL for the dataPoint.
+        //I created the UrlStyles object early on, expecting that I would have more than just 2.
+        //I decided to keep it in, since it makes it easier to add more styles in the future.
         URL: UrlStyles.Basic,
+        //colorStyle is used to determine how to format the stat coloring based on ranking
         colorStyle: "Red-Green",
+        
+        /*This handles the portion of parsing the data returned from the API that is specific to this dataPoint
+        The reusable portion of the parsing is handled in the parseData function, located at the bottom of index.js*/
+            /*It's likely that I could make this a bit more DRY and just use parseData
+            but due to how much time I spent reverse engineering the API due to bad documentation, I found this to be a good compromise.*/
         specialParse: function(obj, loc) {
             let value = formatValue(loc["Average Wage"], "money");
             obj.formattedValue = value[0];
@@ -54,6 +67,7 @@ dataPoints = {
     },
     "Health": {
         URL: UrlStyles.Basic,
+        drilldowns: [],
         colorStyle: "Red-Green",
         specialParse(obj, loc, config) {
             let value = formatValue(loc[config.measure], health[filters[currentIndex].value][config.display].type);
