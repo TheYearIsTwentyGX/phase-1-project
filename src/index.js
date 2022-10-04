@@ -81,9 +81,10 @@ function buildURL(datapoint) {
     //Add a drilldown based on scope
     switch (scope.value) {
         case "Single_State":
-            retUrl += `&${states.apiCall(stateSelects[currentIndex].value)}`;
+			retUrl += `&${states.apiCall(stateSelects[currentIndex].value)}`;
             break;
         case "All_States":
+			if (dataSets[currentIndex].value != "Citizenship")
             drilldowns.push("State");
             break;
     }
@@ -126,7 +127,7 @@ function buildURL(datapoint) {
     if (drillString.endsWith(','))
         drillString = drillString.substring(0, drillString.length - 1);
     //I have to specifically check if Year has been added because Election Results won't accept latest. You have to specify the actual election year.
-    if (!retUrl.includes('&Year='))
+    if (!retUrl.includes('&Year=') && dataSets[currentIndex].value != "Citizenship")
         retUrl += "&Year=latest";
     //Put all parts of the URL together
     retObj.URL = retUrl + ((drillString==`&drilldowns=`) ? '' : drillString);
@@ -136,21 +137,36 @@ function buildURL(datapoint) {
 
 function parseData(...data) {
     let retArr = [];
+	console.log(data[0]);
     //This is used to condense data that has multiple entries for the same state down to a single state.
     //One example is for Election Results, where it gives me the results for each party for each state as separate entries in the returned array.
-    if (data[0].length >= 100) {
-        let reducedArr = [];
-        for (let i = 0; i < data[0].length/2; i += 1) {
-            if (ignoreStates.includes(data[0][i].State))
-                continue;
-            reducedArr.push([data[0][i], data[0][i+(data[0].length/2)]]);
-        }
+    if (data[0].length >= 80) {
+		let reducedArr = [];
+		if (Object.keys(data[0][0]).includes("Citizenship")) {
+			for (let s of Object.keys(states)) {
+				s = s.replace('_', ' ');
+				let test = data[0].filter(x => (x["Geography"] == s || x["State"] == s) && x["ID Citizenship"] == 0 && x["Year"] == "2020");
+				if (test.length > 0)
+					reducedArr.push(test[0]);
+			}
+		}
+		else {
+			for (let i = 0; i < data[0].length/2; i += 1) {
+				if (ignoreStates.includes(data[0][i].State))
+					continue;
+				reducedArr.push([data[0][i], data[0][i+(data[0].length/2)]]);
+			}
+		}
         data[0] = reducedArr;
+		if (reducedArr.length > 1 && reducedArr.length < 50)
+			alert('Could only pull partial data!');
     }
     //Parse down the data to remove unnecessary information. 
     //I also format the data to be more universal, such as changing the specific name of the statistic to "value", which is necessary for the sort function located in tools.js
     for (let location of data[0]) {
         let obj = {};
+		if (Object.keys(location).includes("Geography") && location["State"] == undefined)
+			location.State = location["Geography"];
         //Not every statistic has data for DC/Puerto Rico, so I always ignore those 2 locations to ensure that they don't misalign the displayed table.
         if (ignoreStates.includes(location.State))
             continue;

@@ -28,6 +28,20 @@ dataPoints = {
             obj.text = `Average wage$display in $loc is $value`;
         }
     },
+    "Citizenship": {
+        arg: "measure=Citizenship%20Status&drilldowns=Citizenship&Geography=01000US,01000US:similar",
+        URL: UrlStyles.Basic,
+        drilldowns: [],
+        colorStyle: "Red-Green",
+        specialParse: function(obj, loc) {
+            let value = formatValue(loc["Citizenship Status"], "largeNumber");
+            obj.formattedValue = value[0];
+            obj.value = value[1];
+            obj.text = `There are $value legal citizens in $loc`;
+            console.log("Got here for " + loc["Geography"]);
+            
+        }
+    },
     "Election Results": {
         arg: "cube=Data_USA_President_election&Year=2020&measures=Candidate+Votes&Party=Democratic,Republican",
         URL: UrlStyles.Uranium,
